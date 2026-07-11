@@ -13,6 +13,12 @@
 
 프롬프트에 "이렇게 해주세요"라고 쓰면 무시된다. 규칙은 코드가 되어야 강제된다.
 
+## 환경
+
+- `.mcp.json` — firecrawl MCP (셀프호스팅, `localhost:3002`).
+  `make factcheck` 이후 출처 보충 단계에서 **쓸 수 있다.**
+  **없어도 하네스는 돈다** — web_fetch 로 하면 된다.
+
 ## 계약서
 
 `guides/RULES.md` 가 **린터의 계약서**다. 규칙 ID(SVG-01, POST-01, CONV-01 …)와
