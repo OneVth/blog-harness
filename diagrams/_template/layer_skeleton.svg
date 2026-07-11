@@ -1,0 +1,12 @@
+<svg viewBox="0 0 720 480" xmlns="http://www.w3.org/2000/svg"
+     font-family="Noto Sans CJK KR, sans-serif">
+  <line x1="90" y1="250" x2="690" y2="250" stroke="#444" stroke-width="1.5"/>
+  <line x1="30" y1="350" x2="690" y2="350" stroke="#444" stroke-width="1.5"/>
+
+  <text x="96" y="62"  font-size="12" font-weight="bold" fill="#888">User mode</text>
+  <text x="96" y="270" font-size="12" font-weight="bold" fill="#888">Kernel mode</text>
+  <text x="38" y="330" font-size="12" font-weight="bold" fill="#888">S/W</text>
+  <text x="38" y="370" font-size="12" font-weight="bold" fill="#888">H/W</text>
+
+  <!-- 각 띠에 박스·화살표 추가 -->
+</svg>
