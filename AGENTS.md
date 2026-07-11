@@ -75,7 +75,7 @@ drafts/<slug>.md
 
 | 파일 | 무엇 |
 |---|---|
-| `RULES.md` | 린터의 계약서 (31개 규칙) — **먼저 본다** |
+| `RULES.md` | 린터의 계약서 — **먼저 본다.** 여기 있는 것만 코드가 되고, 여기 없는 것은 검사하지 않는다 |
 | `writing.md` | 글쓰기 규칙 (톤·출처·구조). **여기 산다. 재진술 금지** |
 | `categories.md` · `tags.md` | 발행글 분류 |
 | `callouts.md` | Obsidian → HTML 변환 계약 |
@@ -93,3 +93,7 @@ drafts/<slug>.md
 | `posts/` | 변환된 발행본 (`<cat>/<slug>.md`) |
 | `factcheck/` | 팩트체크 로그 |
 | `docs/solutions/` | 문서화된 해결 기록 (버그·툴링 결정·워크플로·규칙) — 카테고리별 디렉토리 + YAML frontmatter(`module`·`tags`·`problem_type`)로 검색. 문서화된 영역에서 구현·디버깅·결정 시 참고. `ce-compound` 스킬이 씀 |
+
+> **이 저장소는 public 이다.** `docs/solutions/` 에 내부 인프라 세부를 쓰지 않는다 —
+> 내부 IP, 터널 이름, 도메인, 서비스 구성. "내 환경에서는" 으로 추상화한다.
+> `ce-compound` 가 Learning 을 쓸 때 이 줄을 읽는다.
