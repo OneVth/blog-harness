@@ -6,15 +6,22 @@ requires-python = ">=3.12"
 # 절반은 버리게 된다. 도구가 실제로 필요할 때만 여기에 추가한다.
 dependencies = []
 
+# 이미지 검사(thumbnail_check)에만 필요한 opt-in 의존성. 코어는 여전히 rippable.
+[project.optional-dependencies]
+thumbnail = ["pillow"]
+
 [project.scripts]
 # 도구가 생길 때마다 추가한다. 예: convert-callouts = "blog_harness.convert_callouts:main"
 lint-svg = "blog_harness.lint_svg:main"
 lint-post = "blog_harness.lint_post:main"
 factcheck = "blog_harness.factcheck:main"
 factcheck-apply = "blog_harness.factcheck:apply_main"
+thumbnail-prompt = "blog_harness.thumbnail_prompt:main"
+thumbnail-check = "blog_harness.thumbnail_check:main"
 
 [dependency-groups]
-dev = ["pytest", "ruff"]
+# pillow: thumbnail_check 테스트가 실제 이미지를 열어야 하므로 dev 에도 넣는다.
+dev = ["pytest", "ruff", "pillow"]
 
 [build-system]
 requires = ["hatchling"]

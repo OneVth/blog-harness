@@ -2,6 +2,8 @@
 *.png
 # 예외: 썸네일은 GPT가 만든 소스다
 !thumbnails/*.png
+# 재-무시: .150.png 는 thumbnail_check 가 만든 파생 산출물이다 (소스 아님)
+thumbnails/*.150.png
 
 .venv/
 __pycache__/
@@ -11,3 +13,6 @@ __pycache__/
 # 팩트체크: 프롬프트·응답은 초안별 임시 작업물이다. 로그(.log.md)는 교착 근거라 추적한다.
 factcheck/*.prompt.txt
 factcheck/*.response.json
+
+# 썸네일 프롬프트는 초안별 임시 작업물이다 (factcheck 관례).
+thumbnails/*.prompt.txt
