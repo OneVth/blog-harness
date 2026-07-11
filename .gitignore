@@ -7,3 +7,7 @@
 __pycache__/
 .pytest_cache/
 .ruff_cache/
+
+# 팩트체크: 프롬프트·응답은 초안별 임시 작업물이다. 로그(.log.md)는 교착 근거라 추적한다.
+factcheck/*.prompt.txt
+factcheck/*.response.json

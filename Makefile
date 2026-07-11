@@ -1,4 +1,4 @@
-.PHONY: setup test lint lint-svg lint-post check png palette-report
+.PHONY: setup test lint lint-svg lint-post check png palette-report factcheck factcheck-apply
 
 setup:
 	uv sync
@@ -24,3 +24,12 @@ png:
 
 palette-report:
 	uv run lint-svg --palette-report diagrams/
+
+# 팩트체크는 GPT 왕복 수동 게이트라 check 에 넣지 않는다 (무인 실행 불가).
+# 1) 프롬프트 생성 → factcheck/<slug>.prompt.txt 를 GPT에 붙여넣는다.
+factcheck:
+	uv run factcheck $(POST)
+
+# 2) GPT 응답(factcheck/<slug>.response.json)을 파싱해 심각도순 리포트. 자동 수정 없음.
+factcheck-apply:
+	uv run factcheck-apply $(POST)
