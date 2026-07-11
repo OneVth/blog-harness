@@ -1,0 +1,9 @@
+# PNG는 SVG에서 생성되는 산출물이다
+*.png
+# 예외: 썸네일은 GPT가 만든 소스다
+!thumbnails/*.png
+
+.venv/
+__pycache__/
+.pytest_cache/
+.ruff_cache/

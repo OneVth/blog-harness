@@ -1,0 +1,24 @@
+[project]
+name = "blog-harness"
+version = "0.1.0"
+requires-python = ">=3.12"
+# 런타임 의존성은 비워둔다. 하네스는 rippable해야 한다 — 모델이 좋아지면
+# 절반은 버리게 된다. 도구가 실제로 필요할 때만 여기에 추가한다.
+dependencies = []
+
+[project.scripts]
+# 도구가 생길 때마다 추가한다. 예: convert-callouts = "blog_harness.convert_callouts:main"
+
+[dependency-groups]
+dev = ["pytest", "ruff"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/blog_harness"]
+
+[tool.ruff]
+target-version = "py312"
+src = ["src", "tests"]
