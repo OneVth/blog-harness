@@ -86,4 +86,4 @@ drafts/<slug>.md
 | `thumbnails/` | GPT가 만든 썸네일 소스 (PNG 예외로 추적) |
 | `posts/` | 변환된 발행본 (`<cat>/<slug>.md`) |
 | `factcheck/` | 팩트체크 로그 |
-| `docs/solutions/` | 트러블슈팅 기록 |
+| `docs/solutions/` | 문서화된 해결 기록 (버그·툴링 결정·워크플로·규칙) — 카테고리별 디렉토리 + YAML frontmatter(`module`·`tags`·`problem_type`)로 검색. 문서화된 영역에서 구현·디버깅·결정 시 참고. `ce-compound` 스킬이 씀 |
