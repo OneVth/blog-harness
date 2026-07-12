@@ -15,7 +15,7 @@ drafts/<slug>.md          Obsidian 표준 callout 문법
       │
       │  make build
       ▼
-posts/<cat>/<slug>.md     <blockquote class="markdown-callout ...">
+posts/<slug>.md           <blockquote class="markdown-callout ...">
       │
       ▼
 Tistory 마크다운 에디터에 붙여넣기 → 마크다운 모드로 발행

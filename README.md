@@ -36,7 +36,7 @@ drafts/<slug>.md
      ↓ im-not-ai          strip the "AI smell" (external tool)
 ★ final file frozen
      ├→ Obsidian archive (callout syntax as-is)
-     └→ make build → posts/<cat>/<slug>.md (callout → HTML)
+     └→ make build → posts/<slug>.md (callout → HTML)
      ↓ make thumbnail-prompt
      ↓ human: paste into GPT       ← gate ③
      ↓ make thumbnail-check + blind test
@@ -128,11 +128,9 @@ conversion, and the four-axis tag convention.
 
 ## Status — honestly
 
-Phases 0 through 6 are implemented. **The pipeline has never been run on a real
-post yet.** When it breaks against a real article, that breakage becomes
-ce-compound's second Learning. (One known gap already: the pipeline diagram
-shows `make build`, but that target isn't wired in the Makefile yet — the
-callout → HTML conversion exists as code but not as a make target.)
+Phases 0 through 6 are implemented, including the callout → HTML `make build`
+step. **The pipeline has never been run on a real post yet.** When it breaks
+against a real article, that breakage becomes ce-compound's second Learning.
 
 ## License
 

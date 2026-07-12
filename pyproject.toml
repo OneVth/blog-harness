@@ -11,7 +11,8 @@ dependencies = []
 thumbnail = ["pillow"]
 
 [project.scripts]
-# 도구가 생길 때마다 추가한다. 예: convert-callouts = "blog_harness.convert_callouts:main"
+# 도구가 생길 때마다 추가한다.
+convert-callouts = "blog_harness.convert_callouts:main"
 lint-svg = "blog_harness.lint_svg:main"
 lint-post = "blog_harness.lint_post:main"
 factcheck = "blog_harness.factcheck:main"

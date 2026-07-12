@@ -33,7 +33,7 @@ drafts/<slug>.md
      ↓ im-not-ai          AI 티 제거 (외부 도구)
 ★ 최종 파일 확정
      ├→ Obsidian 아카이브 (callout 문법 그대로)
-     └→ make build → posts/<cat>/<slug>.md (callout → HTML)
+     └→ make build → posts/<slug>.md (callout → HTML)
      ↓ make thumbnail-prompt
      ↓ 사람: GPT에 붙여넣기       ← 게이트 ③
      ↓ make thumbnail-check + 블라인드 테스트
@@ -117,11 +117,9 @@ callout 변환, 4축 태그 컨벤션.
 
 ## 상태 — 정직하게
 
-Phase 0~6 구현 완료. **아직 실제 글로 파이프라인을 돌려본 적이 없다.** 실제
-글에서 깨지는 지점이 나오면, 그게 ce-compound 의 두 번째 Learning 이 된다. (이미
-아는 공백 하나: 파이프라인 다이어그램은 `make build` 를 가리키지만 그 타깃은
-아직 Makefile 에 연결돼 있지 않다 — callout → HTML 변환은 코드로 존재하나 make
-타깃은 아니다.)
+Phase 0~6 구현 완료 — callout → HTML `make build` 스텝을 포함한다. **아직 실제
+글로 파이프라인을 돌려본 적이 없다.** 실제 글에서 깨지는 지점이 나오면, 그게
+ce-compound 의 두 번째 Learning 이 된다.
 
 ## 라이선스
 

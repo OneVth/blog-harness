@@ -1,4 +1,4 @@
-.PHONY: setup test lint lint-svg lint-post check png palette-report factcheck factcheck-apply thumbnail-prompt thumbnail-check
+.PHONY: setup test lint lint-svg lint-post check build png palette-report factcheck factcheck-apply thumbnail-prompt thumbnail-check
 
 setup:
 	uv sync
@@ -17,6 +17,16 @@ lint-post:
 
 # 발행 전 기계 검사: SVG 규격 + 링크(lychee)·태그·카테고리. lint-post 가 POST-06(lychee)을 내부 실행한다.
 check: lint-svg lint-post
+
+# 단일 소스(Obsidian 문법 초안)에서 발행본을 빌드한다. 글을 두 벌 쓰지 않는다.
+# callout 만 HTML 로 바뀌고 나머지 마크다운은 그대로 남는다 (guides/callouts.md §1).
+# posts/ 는 평평하게 간다 — 카테고리는 lint-post 가 CLI 인자로 받는다.
+build:
+ifndef POST
+	$(error POST=<drafts/foo.md> 를 지정할 것)
+endif
+	@mkdir -p posts
+	uv run convert-callouts "$(POST)" -o "posts/$(notdir $(POST))"
 
 # SVG는 소스, PNG는 산출물(gitignore). rsvg-convert 필요 (apt-get install librsvg2-bin)
 png:
