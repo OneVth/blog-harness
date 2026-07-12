@@ -36,6 +36,7 @@ agent can fix and retry without ambiguity.
 import os
 import re
 import sys
+from typing import NoReturn
 
 
 def usage_fail(msg: str) -> "NoReturn":

@@ -40,6 +40,7 @@ import os
 import re
 import subprocess
 import sys
+from typing import NoReturn
 
 # Tokens containing these are placeholders/examples, not real citations.
 PLACEHOLDER_CHARS = set("<>{}*$")

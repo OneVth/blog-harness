@@ -17,6 +17,10 @@ by **Every**, used under the MIT License.
   `ce-simplify-code`, `/research`, `ce-sessions`, `code-simplicity-reviewer`.
 - Added an explicit `mode:lightweight` token (upstream selects Full vs
   Lightweight by context pressure, with no deterministic override).
+- Fixed three pre-existing static-analysis errors in the vendored scripts
+  (no behavior change): added a missing `NoReturn` import in
+  `validate-doc-claims.py` and `validate-frontmatter.py`, and removed an
+  unused exception binding in `session-history/extract-metadata.py`.
 
 The full modification record lives in commit `5ef675c` and
 `docs/solutions/tooling-decisions/vendor-ce-compound-learning-skill.md`.
