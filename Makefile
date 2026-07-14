@@ -1,4 +1,4 @@
-.PHONY: setup test lint lint-svg lint-post check build png palette-report factcheck factcheck-gpt factcheck-apply thumbnail-prompt thumbnail-check
+.PHONY: setup test lint lint-svg lint-post check build png gif palette-report factcheck factcheck-gpt factcheck-apply thumbnail-prompt thumbnail-check
 
 setup:
 	uv sync
@@ -34,6 +34,35 @@ endif
 # SVG는 소스, PNG는 산출물(gitignore). rsvg-convert 필요 (apt-get install librsvg2-bin)
 png:
 	find diagrams -name '*.svg' -exec sh -c 'rsvg-convert -w 2160 "$$0" -o "$${0%.svg}.png"' {} \;
+
+# 애니메이션 GIF 렌더 (diagram-system.md §8). 정적은 make png. Chrome + ffmpeg 필요.
+# 소스 <name>.gif.html 은 ?t=초 로 프레임을 그린다. 산출물 <name>.gif 는 추적한다.
+# 사용: make gif SRC=diagrams/dsa/dp_longest_path.gif.html FRAMES=151 [FPS=12 WIN=660,560 W=700]
+gif:
+ifndef SRC
+	$(error SRC=<diagrams/.../name.gif.html> 를 지정할 것)
+endif
+ifndef FRAMES
+	$(error FRAMES=<프레임 수> 를 지정할 것)
+endif
+	@command -v google-chrome >/dev/null 2>&1 || { echo "[gif] google-chrome 이 없습니다 (headless 렌더러)."; exit 1; }
+	@command -v ffmpeg >/dev/null 2>&1 || { echo "[gif] ffmpeg 이 없습니다 (GIF 조립)."; exit 1; }
+	@fps=$${FPS:-12}; win=$${WIN:-660,560}; w=$${W:-700}; \
+	out=$$(echo "$(SRC)" | sed 's/\.gif\.html$$/.gif/'); \
+	tmp=$$(mktemp -d); \
+	echo "[gif] $(FRAMES) 프레임 렌더 ($$fps fps, $$win)…"; \
+	for f in $$(seq 0 $$(( $(FRAMES) - 1 ))); do \
+	  t=$$(awk "BEGIN{printf \"%.4f\", $$f/$$fps}"); \
+	  google-chrome --headless=new --disable-gpu --no-sandbox --force-device-scale-factor=2 \
+	    --default-background-color=FFFFFFFF --hide-scrollbars --virtual-time-budget=500 \
+	    --screenshot="$$tmp/$$(printf '%04d' $$f).png" --window-size=$$win \
+	    "file://$(CURDIR)/$(SRC)?t=$$t" >/dev/null 2>&1; \
+	done; \
+	ffmpeg -y -framerate $$fps -i "$$tmp/%04d.png" -vf "scale=$$w:-1:flags=lanczos,palettegen=stats_mode=diff" "$$tmp/pal.png" >/dev/null 2>&1; \
+	ffmpeg -y -framerate $$fps -i "$$tmp/%04d.png" -i "$$tmp/pal.png" \
+	  -lavfi "scale=$$w:-1:flags=lanczos[x];[x][1:v]paletteuse=dither=sierra2_4a" -loop 0 "$$out" >/dev/null 2>&1; \
+	rm -rf "$$tmp"; \
+	echo "[gif] 완료: $$out ($$(du -h "$$out" | cut -f1))"
 
 palette-report:
 	uv run lint-svg --palette-report diagrams/
