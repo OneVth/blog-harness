@@ -196,11 +196,15 @@ EFI 파티션을 만들었는데도 넘어가지 않았다.
 placeholder로 쓰고, 발행 시 PNG를 드래그앤드롭한다.
 설명은 **무엇을 보여주는 그림인지** 구체적으로 쓴다.
 
-자작 다이어그램은 파일명을 함께 적는다.
+자작 다이어그램은 파일명을 함께 적는다. **첫 토큰을 파일명(소문자_밑줄)으로 둔다** —
+`lint_post`가 이 파일명을 `diagrams/` 에 대조한다 (POST-13). 오타·드리프트를 잡는다.
 
 ```markdown
 [IMG: net_vpn_concept — VPN = Virtual + Private 분해. 사설망이 인터넷 위로 확장되는 개념도]
 ```
+
+애니메이션 GIF 도 같다: `[IMG: dp_longest_path (애니메이션) — ...]`. 첫 토큰 `dp_longest_path`
+가 `diagrams/dsa/dp_longest_path.gif` 로 존재하면 통과.
 
 ### 3.6 Callout
 

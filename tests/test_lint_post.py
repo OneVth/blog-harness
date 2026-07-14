@@ -15,6 +15,7 @@ from blog_harness.lint_post import (
     check_dead_links,
     check_dramatic_idiom,
     check_image_refs,
+    check_img_placeholder,
     check_tags,
     lint_metadata,
     lint_post_text,
@@ -323,3 +324,37 @@ def test_main_no_metadata_notice_not_failure(tmp_path, capsys):
     post.write_text(CLEAN_POST, encoding="utf-8")
     assert main([str(post), "--no-links"]) == 0
     assert "미검사" in capsys.readouterr().out
+
+
+# ── POST-13: [IMG:] 자작 다이어그램 파일 참조 ──────────────────────────────
+def _mk_diagram(tmp_path, rel):
+    p = tmp_path / "diagrams" / rel
+    p.parent.mkdir(parents=True, exist_ok=True)
+    p.write_bytes(b"x")
+
+
+def test_img_placeholder_existing_passes(tmp_path):
+    _mk_diagram(tmp_path, "dsa/dp_fib_tree.svg")
+    text = "[IMG: dp_fib_tree — fib(5) 재귀 트리]"
+    assert check_img_placeholder(text, repo_root=tmp_path) == []
+
+
+def test_img_placeholder_gif_with_annotation_passes(tmp_path):
+    _mk_diagram(tmp_path, "dsa/dp_longest_path.gif")
+    text = "[IMG: dp_longest_path (애니메이션) — 최장 경로 움짤]"
+    assert check_img_placeholder(text, repo_root=tmp_path) == []
+
+
+def test_img_placeholder_drift_warns(tmp_path):
+    """파일명 꼴인데 diagrams/ 에 없으면 WARN (이번 세션에 낸 dsa_ prefix 버그)."""
+    _mk_diagram(tmp_path, "dsa/dp_fib_tree.svg")
+    findings = check_img_placeholder("[IMG: dsa_dp_fib_tree — 오타]", repo_root=tmp_path)
+    assert "POST-13" in ids(findings)
+    assert WARN in {f.level for f in findings}
+
+
+@pytest.mark.parametrize("text", ["[IMG: 설치 화면 스크린샷]", "[IMG: Symmetric NAT #1 — 출발지 IP]"])
+def test_img_placeholder_prose_skipped(tmp_path, text):
+    """산문 설명형(첫 토큰이 파일명 꼴 아님)은 검사 대상이 아니다."""
+    (tmp_path / "diagrams").mkdir()
+    assert check_img_placeholder(text, repo_root=tmp_path) == []

@@ -381,6 +381,22 @@ lychee가 없으면 안내를 출력하고 **이 검사만 스킵한다.**
 
 출처: `writing.md` §4.3
 
+### POST-13 — `[IMG:]` 자작 다이어그램 파일 참조 (WARN)
+
+```
+조건:  [IMG: <name> ...] 의 <name>(소문자_밑줄 복합어)이
+       diagrams/ 아래 <name>.{svg,gif,png} 로 존재
+```
+
+**POST-07은 발행본의 `![]()` 만 본다.** 초안이 실제로 쓰는 `[IMG:]` placeholder 의 자작
+다이어그램 파일명은 그동안 미검사였다 — 파일명 드리프트(예: `dsa_dp_fib_tree` vs 실제
+`dp_fib_tree`)가 발행본까지 새어나갔다.
+
+**첫 토큰이 파일명 꼴(소문자_밑줄 복합어)일 때만 검사한다.** 산문 설명형(`[IMG: 설치 화면]`·
+`[IMG: Symmetric NAT #1]`)은 첫 토큰이 파일명 꼴이 아니라 **건너뛴다.** 휴리스틱이라 WARN.
+
+출처: `writing.md` §3.5
+
 ---
 
 ## 썸네일 — `thumbnail_check`

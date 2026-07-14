@@ -1,4 +1,4 @@
-"""발행글 마크다운 린터 — guides/RULES.md 의 POST-01~12 를 강제한다.
+"""발행글 마크다운 린터 — guides/RULES.md 의 POST-01~13 를 강제한다.
 
 파이프라인의 게이트다. 카테고리·태그·구조를 `make check` 에서 기계로 검증해, 매번
 손으로 확인하던 것을 규칙 ID를 출력하는 자동 검사로 바꾼다. RULES.md 가 계약서다 —
@@ -63,6 +63,10 @@ PLURAL_SAFE_SUFFIX = ("ss", "us", "is", "os")
 # ── 정규식 ─────────────────────────────────────────────────────────────────
 _FENCE_RE = re.compile(r"^(\s*)(`{3,}|~{3,})(.*)$")
 _IMG_RE = re.compile(r"!\[([^\]]*)\]\(([^)]+)\)")
+# guides/RULES.md § POST-13 — [IMG: <name> ...] 자작 다이어그램 파일명 참조
+_IMG_PLACEHOLDER_RE = re.compile(r"\[IMG:\s*([^\]]*)")
+_DIAGRAM_NAME_RE = re.compile(r"^[a-z0-9]+(?:_[a-z0-9]+)+$")  # 소문자_밑줄 복합어만 파일명으로 본다
+_DIAGRAM_EXTS = (".svg", ".gif", ".png")
 _INLINE_CODE_RE = re.compile(r"`[^`]*`")
 _HEADING_RE = re.compile(r"^(#{1,6})\s")
 _H2_RE = re.compile(r"^##\s+(.+?)\s*$")
@@ -396,6 +400,43 @@ def check_image_refs(text: str, repo_root: Path | str | None = None) -> list[Fin
     return findings
 
 
+def check_img_placeholder(text: str, repo_root: Path | str | None = None) -> list[Finding]:
+    """POST-13 — [IMG: <name> ...] 의 자작 다이어그램 파일명이 diagrams/ 에 있으면 통과 (WARN).
+
+    발행 placeholder(`[IMG:]`)는 POST-07(`![]()`) 검사 대상이 아니다. 하지만 자작
+    다이어그램(SVG/GIF)은 초안 시점에 파일이 이미 있으므로 파일명 드리프트를 잡을 수 있다.
+    첫 토큰이 파일명 꼴(소문자_밑줄 복합어)일 때만 검사한다 — 산문 설명은 건너뛴다(오탐 방지).
+    """
+    root = Path(repo_root) if repo_root is not None else _find_repo_root()
+    diagrams = root / "diagrams"
+    lines = text.splitlines()
+    mask = _fence_mask(lines)
+    findings: list[Finding] = []
+    for i, line in enumerate(lines):
+        if mask[i]:
+            continue
+        m = _IMG_PLACEHOLDER_RE.search(line)
+        if not m:
+            continue
+        tokens = m.group(1).split()
+        token = tokens[0] if tokens else ""
+        if not _DIAGRAM_NAME_RE.match(token):  # 설명형([IMG: 설치 화면 …])은 스킵
+            continue
+        found = diagrams.exists() and any(
+            list(diagrams.rglob(token + ext)) for ext in _DIAGRAM_EXTS
+        )
+        if not found:
+            findings.append(
+                Finding(
+                    WARN,
+                    "POST-13",
+                    f"[IMG:] 파일명 '{token}' 을 diagrams/ 에서 못 찾음 (line {i + 1}) — "
+                    "오타인가? 설명이면 파일명 꼴(소문자_밑줄)을 피한다.",
+                )
+            )
+    return findings
+
+
 def check_section_depth(text: str) -> list[Finding]:
     """POST-08 — #### 이하 금지, # 은 제목에만 (WARN)."""
     lines = text.splitlines()
@@ -565,12 +606,13 @@ def check_dead_links(
 def lint_post_text(
     text: str, path: str = "mem.md", repo_root: Path | str | None = None
 ) -> list[Finding]:
-    """한 마크다운 텍스트에 본문 체크(POST-07~12)를 적용한다. 테스트 코어.
+    """한 마크다운 텍스트에 본문 체크(POST-07~13)를 적용한다. 테스트 코어.
 
     메타데이터 체크(POST-01~05)는 frontmatter/CLI 인자에서 오므로 여기 없다 — lint_metadata 참조.
     """
     findings: list[Finding] = []
     findings += check_image_refs(text, repo_root)
+    findings += check_img_placeholder(text, repo_root)
     findings += check_section_depth(text)
     findings += check_conclusion(text)
     findings += check_body_dash(text)
@@ -679,7 +721,7 @@ def _run_lint(
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
-        prog="lint-post", description="발행글 마크다운 린터 (guides/RULES.md POST-01~12)"
+        prog="lint-post", description="발행글 마크다운 린터 (guides/RULES.md POST-01~13)"
     )
     parser.add_argument("paths", nargs="+", help="마크다운 파일 또는 디렉토리(재귀)")
     parser.add_argument("--category", help="글의 카테고리 (POST-01)")
