@@ -149,7 +149,7 @@ def fibo_tab(n: int) -> int:
 
 <blockquote class="markdown-callout markdown-callout-warning">
   <p class="callout-title">기저는 "당연한 값"이 아니다</p>
-  <p><code>dp[0] = 1</code>인 이유는 "아무것도 안 하고 출발점에 서 있는 것"도 유효한 한 가지 방법(빈 걸음 시퀀스)이기 때문이다. 여기를 0으로 두면 <code>dp[2] = 1</code>이 되어, 실제 값(1+1, 2 두 가지)과 어긋난다. <strong>기저는 전이를 성립시키는 값으로 잡는다.</strong></p>
+  <p><code>dp[0] = 1</code>인 이유는 "아무것도 안 하고 출발점에 서 있는 것"도 유효한 한 가지 방법(빈 걸음 시퀀스)이기 때문이다. 여기를 0으로 두면 <code>dp[2] = 1</code>이 되어, 실제 값(1+1, 2 두 가지)과 어긋난다. 기저는 <strong>전이를 성립시키는 값</strong>으로 잡는다.</p>
 </blockquote>
 
 계단 오르기의 점화식은 피보나치와 같다. 두 수열을 나란히 놓으면 이렇다.
@@ -174,7 +174,7 @@ def fibo_tab(n: int) -> int:
 
 <blockquote class="markdown-callout markdown-callout-warning">
   <p class="callout-title">상태 정의의 함정</p>
-  <p><code>dp[i-1] + a[i]</code>는 "<code>dp[i-1]</code>의 구간에 <code>a[i]</code>를 이어붙인다"는 뜻이다. 그런데 "0부터 i-1까지의 최대 합"은 <strong>그 구간이 i-1에서 끝난다는 보장이 없다.</strong> <code>[5]</code>는 인덱스 0에서 끝나는데 거기에 인덱스 2의 <code>3</code>을 붙이면(5+3=8) 사이의 <code>-10</code>을 건너뛴 셈이 된다. 존재하지 않는 부분 배열이다.</p>
+  <p><code>dp[i-1] + a[i]</code>는 "<code>dp[i-1]</code>의 구간에 <code>a[i]</code>를 이어붙인다"는 뜻이다. 그런데 "0부터 i-1까지의 최대 합"은 그 구간이 i-1에서 끝난다는 <strong>보장이 없다</strong>. <code>[5]</code>는 인덱스 0에서 끝나는데 거기에 인덱스 2의 <code>3</code>을 붙이면(5+3=8) 사이의 <code>-10</code>을 건너뛴 셈이 된다. 존재하지 않는 부분 배열이다.</p>
 </blockquote>
 
 이 문제는 상태 정의에 끝점을 포함시켜 해결한다.
