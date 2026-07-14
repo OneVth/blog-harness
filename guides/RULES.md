@@ -498,6 +498,11 @@ lychee가 없으면 안내를 출력하고 **이 검사만 스킵한다.**
 
 린터가 아니라 **크로스 프로바이더 판정**이다. GPT가 판정하고 Claude가 조율한다.
 
+판정은 두 경로 중 하나로 GPT 에 넘긴다. 어느 쪽이든 **판정자는 GPT(다른 프로바이더)** 라 FACT-02 를 지킨다.
+- **수동**: `make factcheck` → 프롬프트를 ChatGPT 에 붙여넣고 응답을 `response.json` 에 저장.
+- **자동**: `make factcheck-gpt` → `codex`(OpenAI GPT)를 read-only 로 실행해 `response.json` 을 바로 쓴다.
+  codex 가 없으면 안내하고 멈춘다 (수동 경로로 폴백). **Claude 가 판정하지 않는다** — 그러면 에코 챔버다.
+
 ### FACT-01 — 판정 카테고리
 
 ```

@@ -1,4 +1,4 @@
-.PHONY: setup test lint lint-svg lint-post check build png palette-report factcheck factcheck-apply thumbnail-prompt thumbnail-check
+.PHONY: setup test lint lint-svg lint-post check build png palette-report factcheck factcheck-gpt factcheck-apply thumbnail-prompt thumbnail-check
 
 setup:
 	uv sync
@@ -38,10 +38,28 @@ png:
 palette-report:
 	uv run lint-svg --palette-report diagrams/
 
-# 팩트체크는 GPT 왕복 수동 게이트라 check 에 넣지 않는다 (무인 실행 불가).
-# 1) 프롬프트 생성 → factcheck/<slug>.prompt.txt 를 GPT에 붙여넣는다.
+# 팩트체크는 GPT 왕복 게이트다 — GPT(다른 프로바이더)가 판정해 에코 챔버를 깬다 (FACT-02).
+# 1) 프롬프트 생성 → factcheck/<slug>.prompt.txt 를 GPT에 붙여넣는다. (수동 경로)
 factcheck:
 	uv run factcheck $(POST)
+
+# 1-auto) codex(OpenAI GPT)로 판정을 자동화한다. 붙여넣기 없이 크로스 프로바이더를 지킨다.
+# codex 는 Claude 와 다른 프로바이더라 FACT-02 를 만족한다. read-only 샌드박스 — 판정만 한다.
+# codex 없으면 안내하고 멈춘다 (수동 경로로 폴백). 판정 후 make factcheck-apply 로 리포트를 본다.
+factcheck-gpt:
+ifndef POST
+	$(error POST=<drafts/foo.md> 를 지정할 것)
+endif
+	@command -v codex >/dev/null 2>&1 || { echo "[factcheck-gpt] codex 가 없습니다. 설치하거나 factcheck/<slug>.prompt.txt 를 GPT 에 직접 붙여넣으세요 (make factcheck)."; exit 1; }
+	uv run factcheck $(POST)
+	@slug=$(notdir $(basename $(POST))); \
+	echo "[factcheck-gpt] codex(GPT, read-only)로 판정 중…"; \
+	codex exec --sandbox read-only -C "$(CURDIR)" \
+	  --output-last-message "factcheck/$$slug.response.json" \
+	  < "factcheck/$$slug.prompt.txt" >/dev/null; \
+	python3 -c "import json; json.load(open('factcheck/$$slug.response.json'))" \
+	  && echo "[factcheck-gpt] 판정 저장됨 → make factcheck-apply POST=$(POST)" \
+	  || { echo "[factcheck-gpt] codex 출력이 JSON 이 아닙니다. 확인: factcheck/$$slug.response.json"; exit 1; }
 
 # 2) GPT 응답(factcheck/<slug>.response.json)을 파싱해 심각도순 리포트. 자동 수정 없음.
 factcheck-apply:
