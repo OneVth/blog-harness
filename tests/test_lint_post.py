@@ -9,21 +9,27 @@ from pathlib import Path
 import pytest
 
 from blog_harness.lint_post import (
+    WARN,
+    SpecError,
     _find_guides_dir,
     check_dead_links,
+    check_dramatic_idiom,
     check_image_refs,
     check_tags,
     lint_metadata,
     lint_post_text,
     load_categories,
+    load_dramatic_idioms,
     load_source_tags,
     main,
+    parse_frontmatter,
 )
 
 REPO = Path(__file__).resolve().parents[1]
 GUIDES = str(_find_guides_dir())
 VALID = load_categories(GUIDES)
 SOURCES = load_source_tags(GUIDES)
+IDIOMS = load_dramatic_idioms(GUIDES)
 
 
 def ids(findings) -> list[str]:
@@ -253,3 +259,67 @@ def test_main_strict_promotes_warn(tmp_path):
     post.write_text("# 제목\n\n## 본론\n\n내용.\n\n## 설치 완료\n\n끝.", encoding="utf-8")
     assert main([str(post), "--no-links"]) == 0
     assert main([str(post), "--strict", "--no-links"]) == 1
+
+
+# ── POST-12: 극적 수사 어휘 ────────────────────────────────────────────────
+def test_dramatic_idiom_warns():
+    """본문 산문의 극적 관용구는 POST-12 WARN."""
+    text = "# 제목\n\n## 들어가며\n\n이 문제의 열쇠는 상태를 못 박는 것이다.\n\n## 마무리\n\n끝."
+    findings = lint_post_text(text)
+    assert "POST-12" in ids(findings)
+    assert WARN in {f.level for f in findings if f.rule_id == "POST-12"}
+
+
+def test_dramatic_idiom_skips_structural_and_code():
+    """제목·IMG·표·코드펜스 안의 어휘는 POST-12 대상이 아니다 (오탐 방지)."""
+    text = (
+        "# 심장이다 라는 부제\n\n[IMG: x — 열쇠는 여기]\n\n"
+        "| 열쇠는 | 지배한다 |\n|---|---|\n\n```text\n못 박는다\n```\n\n## 마무리\n\n끝."
+    )
+    assert "POST-12" not in ids(check_dramatic_idiom(text, IDIOMS))
+
+
+def test_dramatic_idioms_parsed_from_block():
+    """writing.md §4.3 DRAMATIC_IDIOMS 블록이 파싱된다."""
+    assert "못 박" in IDIOMS
+    assert "열쇠는" in IDIOMS
+
+
+def test_missing_dramatic_block_raises(tmp_path):
+    (tmp_path / "writing.md").write_text("no markers here", encoding="utf-8")
+    load_dramatic_idioms.cache_clear()
+    with pytest.raises(SpecError):
+        load_dramatic_idioms(str(tmp_path))
+    load_dramatic_idioms.cache_clear()
+
+
+# ── frontmatter: 메타데이터의 집 ────────────────────────────────────────────
+def test_frontmatter_parsed():
+    text = "---\ncategory: DSA\ntags: [Array, 배열, 정리]\n---\n\n# 제목\n\n본문."
+    cat, tags, body = parse_frontmatter(text)
+    assert cat == "DSA"
+    assert tags == ["Array", "배열", "정리"]
+    assert body.startswith("\n# 제목")
+
+
+def test_frontmatter_absent_returns_original():
+    text = "# 제목\n\n본문."
+    cat, tags, body = parse_frontmatter(text)
+    assert (cat, tags, body) == (None, None, text)
+
+
+def test_main_enforces_frontmatter_category(tmp_path):
+    """CLI 인자 없이도 frontmatter 의 잘못된 카테고리를 POST-01 ERROR 로 잡는다."""
+    post = tmp_path / "bad.md"
+    post.write_text(
+        "---\ncategory: NoSuch\ntags: [Docker]\n---\n\n" + CLEAN_POST, encoding="utf-8"
+    )
+    assert main([str(post), "--no-links"]) == 1
+
+
+def test_main_no_metadata_notice_not_failure(tmp_path, capsys):
+    """frontmatter 도 인자도 없으면 조용히 넘기지 않고 알리되, 실패는 아니다."""
+    post = tmp_path / "nometa.md"
+    post.write_text(CLEAN_POST, encoding="utf-8")
+    assert main([str(post), "--no-links"]) == 0
+    assert "미검사" in capsys.readouterr().out

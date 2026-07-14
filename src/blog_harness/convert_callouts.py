@@ -35,6 +35,8 @@ INFO = "INFO"
 # ── 정규식 ─────────────────────────────────────────────────────────────────
 # lint_post._FENCE_RE 와 동일 — 코드펜스 인식 (CONV-01)
 _FENCE_RE = re.compile(r"^(\s*)(`{3,}|~{3,})(.*)$")
+# 선행 YAML frontmatter — 발행본에서 제거 (lint_post.parse_frontmatter 와 대칭)
+_FRONTMATTER_RE = re.compile(r"\A---[ \t]*\n.*?\n---[ \t]*\n?", re.DOTALL)
 # callout 헤더: `> [!타입]` (foldable +/- 는 §6 에서 무시). title 은 선택.
 _CALLOUT_RE = re.compile(r"^>\s?\[!(\w+)\][-+]?\s*(.*?)\s*$")
 # blockquote 본문 한 줄 — 선행 `> ` 하나를 벗긴다
@@ -304,7 +306,11 @@ def convert_text(
     """마크다운 전체를 변환한다. callout 만 HTML 로, 나머지는 그대로.
 
     반환: (변환된 텍스트, 경고 목록).
+
+    선행 YAML frontmatter(카테고리·태그 메타데이터의 집)는 발행본에서 떼어낸다 —
+    Tistory 에 새면 안 된다. 메타데이터는 초안에만 살고 lint_post 가 거기서 읽는다.
     """
+    text = _FRONTMATTER_RE.sub("", text, count=1)
     lines = text.splitlines()
     fence = _fence_mask(lines)
     out: list[str] = []

@@ -12,10 +12,13 @@ lint:
 lint-svg:
 	uv run lint-svg diagrams/
 
+# 소스(초안)를 린트한다 — 카테고리·태그는 초안 frontmatter 에서 읽는다 (POST-01~05).
+# 발행본(posts/)이 아니라 초안을 보는 이유: 메타데이터가 거기 살고, build 가 발행본에서
+# frontmatter 를 떼어내기 때문이다 (writing.md §5). 본문 규칙(POST-06~12)은 두 벌이 같다.
 lint-post:
-	uv run lint-post posts/
+	uv run lint-post drafts/
 
-# 발행 전 기계 검사: SVG 규격 + 링크(lychee)·태그·카테고리. lint-post 가 POST-06(lychee)을 내부 실행한다.
+# 발행 전 기계 검사: SVG 규격 + 링크(lychee)·태그·카테고리·본문 톤. lint-post 가 POST-06(lychee)을 내부 실행한다.
 check: lint-svg lint-post
 
 # 단일 소스(Obsidian 문법 초안)에서 발행본을 빌드한다. 글을 두 벌 쓰지 않는다.

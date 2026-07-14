@@ -224,3 +224,19 @@ def test_main_check_clean_returns_0(tmp_path):
 
 def test_main_missing_file_returns_2():
     assert main(["/nonexistent/nope.md"]) == 2
+
+
+def test_frontmatter_stripped_from_output():
+    """발행본에 카테고리·태그 frontmatter 가 새면 안 된다 (Tistory 오염 방지)."""
+    text = "---\ncategory: DSA\ntags: [Array, 배열]\n---\n\n# 제목\n\n본문."
+    out, _ = convert_text(text, ALIASES, TITLES)
+    assert "category:" not in out
+    assert "---" not in out.splitlines()[:2]
+    assert out.lstrip().startswith("# 제목")
+
+
+def test_no_frontmatter_body_unchanged():
+    """frontmatter 가 없으면 본문을 건드리지 않는다."""
+    text = "# 제목\n\n본문 그대로."
+    out, _ = convert_text(text, ALIASES, TITLES)
+    assert out.startswith("# 제목")

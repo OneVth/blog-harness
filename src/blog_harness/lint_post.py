@@ -1,4 +1,4 @@
-"""발행글 마크다운 린터 — guides/RULES.md 의 POST-01~11 을 강제한다.
+"""발행글 마크다운 린터 — guides/RULES.md 의 POST-01~12 를 강제한다.
 
 파이프라인의 게이트다. 카테고리·태그·구조를 `make check` 에서 기계로 검증해, 매번
 손으로 확인하던 것을 규칙 ID를 출력하는 자동 검사로 바꾼다. RULES.md 가 계약서다 —
@@ -55,6 +55,7 @@ PERSONAL_TAGS = frozenset({"기억할것", "공부", "나중에"})
 NOT_PLURAL = frozenset({
     "Redis", "Kubernetes", "HTTPS", "macOS", "DNS", "Windows", "AWS", "iOS",
     "Emacs", "Analytics", "News", "SaaS", "TLS", "DDoS", "CORS", "CSS",
+    "CLRS",
 })
 # guides/RULES.md § POST-05a — 's' 로 끝나지만 복수형이 아닌 접미사 (Class·Bus·Axis·macOS)
 PLURAL_SAFE_SUFFIX = ("ss", "us", "is", "os")
@@ -167,6 +168,63 @@ def load_source_tags(guides_dir: str) -> frozenset[str]:
             "표 행이 `| \\`태그\\` | 출처 |` 형식인지 확인하세요."
         )
     return frozenset(sources)
+
+
+@lru_cache(maxsize=None)
+def load_dramatic_idioms(guides_dir: str) -> frozenset[str]:
+    """writing.md §4.3 의 DRAMATIC_IDIOMS:BEGIN/END 블록을 줄 단위로 파싱한다 (POST-12).
+
+    **자라는 목록**이다 (POST-05a 허용목록·팔레트 승격과 같은 promote 모델). 코드에
+    상수로 박지 않는다 — 반복되는 WARN 을 문서 한 줄로 승격한다.
+    """
+    doc = Path(guides_dir) / "writing.md"
+    if not doc.exists():
+        raise SpecError(f"{doc} 가 없습니다 — 극적 수사 어휘 목록을 읽을 수 없습니다.")
+    text = doc.read_text(encoding="utf-8")
+    m = re.search(
+        r"<!--\s*DRAMATIC_IDIOMS:BEGIN\s*-->(.*?)<!--\s*DRAMATIC_IDIOMS:END\s*-->",
+        text,
+        re.DOTALL,
+    )
+    if not m:
+        raise SpecError(
+            f"{doc} 에서 DRAMATIC_IDIOMS:BEGIN/END 블록을 찾지 못했습니다. "
+            "'<!-- DRAMATIC_IDIOMS:BEGIN -->' / '<!-- DRAMATIC_IDIOMS:END -->' 마커가 있는지 확인하세요."
+        )
+    idioms = frozenset(ln.strip() for ln in m.group(1).splitlines() if ln.strip())
+    if not idioms:
+        raise SpecError(
+            f"{doc} DRAMATIC_IDIOMS 블록이 비어 있습니다. 어휘를 한 줄에 하나씩 넣으세요."
+        )
+    return idioms
+
+
+# ── frontmatter (카테고리·태그 메타데이터의 집) ───────────────────────────────
+_FRONTMATTER_RE = re.compile(r"\A---[ \t]*\n(.*?)\n---[ \t]*\n?", re.DOTALL)
+
+
+def parse_frontmatter(text: str) -> tuple[str | None, list[str] | None, str]:
+    """선행 YAML frontmatter 에서 category(스칼라)·tags(인라인 리스트)를 읽는다.
+
+    반환: (category, tags, body). frontmatter 가 없으면 (None, None, 원문).
+    build(convert_callouts)가 발행본에서 이 블록을 떼어내므로 Tistory 에 새지 않는다.
+    tags 는 인라인 형식만 지원한다:  `tags: [A, B, 한글]`
+    """
+    m = _FRONTMATTER_RE.match(text)
+    if not m:
+        return None, None, text
+    block, body = m.group(1), text[m.end() :]
+    category: str | None = None
+    tags: list[str] | None = None
+    for line in block.splitlines():
+        cm = re.match(r"\s*category\s*:\s*(.+?)\s*$", line)
+        if cm:
+            category = cm.group(1).strip().strip("\"'") or None
+            continue
+        tm = re.match(r"\s*tags\s*:\s*\[(.*)\]\s*$", line)
+        if tm:
+            tags = [t.strip().strip("\"'") for t in tm.group(1).split(",") if t.strip()]
+    return category, tags, body
 
 
 # ── 코드펜스 인식 ──────────────────────────────────────────────────────────
@@ -420,6 +478,38 @@ def check_body_dash(text: str) -> list[Finding]:
     return findings
 
 
+def check_dramatic_idiom(text: str, idioms: frozenset[str]) -> list[Finding]:
+    """POST-12 — 본문 산문의 극적 수사 어휘는 WARN (writing.md §4.3 목록 파싱).
+
+    check_body_dash(POST-10)와 동형: 코드펜스·#·[IMG:·| 로 시작하는 줄은 스킵하고,
+    인라인 코드(`...`)를 제거한 뒤 어휘 부분문자열을 찾는다. 어휘 매칭은 오탐이 나므로
+    WARN 이고, 반복되면 목록에 promote 한다.
+    """
+    lines = text.splitlines()
+    mask = _fence_mask(lines)
+    findings: list[Finding] = []
+    for i, line in enumerate(lines):
+        if mask[i]:
+            continue
+        stripped = line.lstrip()
+        if stripped.startswith(("#", "[IMG:", "|")):
+            continue
+        cleaned = _INLINE_CODE_RE.sub("", line)
+        hit = next((w for w in idioms if w in cleaned), None)
+        if hit:
+            snippet = line.strip()
+            if len(snippet) > 50:
+                snippet = snippet[:50] + "…"
+            findings.append(
+                Finding(
+                    WARN,
+                    "POST-12",
+                    f'극적 수사 "{hit}" (line {i + 1}): "{snippet}" — 담백하게. writing.md §4.3',
+                )
+            )
+    return findings
+
+
 def check_code_lang(text: str) -> list[Finding]:
     """POST-11 — 여는 코드펜스에 언어 태그가 없으면 WARN."""
     findings: list[Finding] = []
@@ -475,15 +565,16 @@ def check_dead_links(
 def lint_post_text(
     text: str, path: str = "mem.md", repo_root: Path | str | None = None
 ) -> list[Finding]:
-    """한 마크다운 텍스트에 본문 체크(POST-07~11)를 적용한다. 테스트 코어.
+    """한 마크다운 텍스트에 본문 체크(POST-07~12)를 적용한다. 테스트 코어.
 
-    메타데이터 체크(POST-01~05)는 CLI 인자에서 오므로 여기 없다 — lint_metadata 참조.
+    메타데이터 체크(POST-01~05)는 frontmatter/CLI 인자에서 오므로 여기 없다 — lint_metadata 참조.
     """
     findings: list[Finding] = []
     findings += check_image_refs(text, repo_root)
     findings += check_section_depth(text)
     findings += check_conclusion(text)
     findings += check_body_dash(text)
+    findings += check_dramatic_idiom(text, load_dramatic_idioms(str(_find_guides_dir())))
     findings += check_code_lang(text)
     return findings
 
@@ -546,23 +637,34 @@ def _run_lint(
             elif f.level == WARN:
                 total_warn += 1
 
-    meta = lint_metadata(category, tags) if (category is not None or tags is not None) else []
-
-    if len(files) == 1:
-        # 단일 파일: 메타데이터 + 본문을 한 헤더 아래 묶어 출력 (헤더 중복 방지)
-        emit(str(files[0]), meta + lint_file(files[0]))
-    else:
-        if meta:
-            emit("메타데이터 (--category/--tags)", meta)
-        for path in files:
-            emit(str(path), lint_file(path))
+    # 파일마다 frontmatter(category/tags)를 읽어 POST-01~05 를 검사한다.
+    # CLI --category/--tags 가 있으면 그것이 frontmatter 를 덮어쓴다 (run 전체 적용).
+    for path in files:
+        text = path.read_text(encoding="utf-8")
+        fm_cat, fm_tags, body = parse_frontmatter(text)
+        eff_cat = category if category is not None else fm_cat
+        eff_tags = tags if tags is not None else fm_tags
+        findings: list[Finding] = []
+        if eff_cat is not None or eff_tags is not None:
+            findings += lint_metadata(eff_cat, eff_tags)
+        else:
+            # 조용한 스킵 금지 — POST-06(lychee)처럼 무엇을 안 봤는지 알린다.
+            findings.append(
+                Finding(
+                    INFO,
+                    "POST-01",
+                    "카테고리·태그 미검사 — frontmatter(category/tags)도 --category/--tags 도 없다.",
+                )
+            )
+        findings += lint_post_text(body, str(path))
+        emit(str(path), findings)
 
     # 죽은 링크 (POST-06, 검사 대상 파일이 있을 때 1회)
     if files:
         link_findings, _ = check_dead_links([str(p) for p in files], skip=no_links)
         emit("죽은 링크 (POST-06)", link_findings)
 
-    if not files and category is None and tags is None:
+    if not files:
         print("검사할 마크다운 파일이 없습니다.", file=sys.stderr)
         return 0
 
@@ -577,7 +679,7 @@ def _run_lint(
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
-        prog="lint-post", description="발행글 마크다운 린터 (guides/RULES.md POST-01~11)"
+        prog="lint-post", description="발행글 마크다운 린터 (guides/RULES.md POST-01~12)"
     )
     parser.add_argument("paths", nargs="+", help="마크다운 파일 또는 디렉토리(재귀)")
     parser.add_argument("--category", help="글의 카테고리 (POST-01)")
