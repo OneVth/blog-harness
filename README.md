@@ -33,7 +33,7 @@ drafts/<slug>.md
      ↓ human: review diagrams      ← gate ②
      ↓ make check         links · tags · categories
      ↓ make factcheck     GPT cross-check (claims with no source)
-     ↓ im-not-ai          strip the "AI smell" (external tool)
+     ↓ humanize-korean    strip the "AI smell" (external tool — im-not-ai repo)
 ★ final file frozen
      ├→ Obsidian archive (callout syntax as-is)
      └→ make build → posts/<slug>.md (callout → HTML)
@@ -73,7 +73,7 @@ check, because a machine can't:
 - Whether a thumbnail reads as the intended concept — a blind test decides.
 - Tone judgments (definition-first prose, first person, procedural voice) —
   these need semantic judgment.
-- The "AI smell" in Korean prose — `im-not-ai` handles that.
+- The "AI smell" in Korean prose — the `humanize-korean` tool handles that (`im-not-ai` repo).
 - Practice-topic tags inside a lecture — context-dependent; the machine can't
   tell a practice subject from a domain concept.
 
@@ -119,7 +119,7 @@ I did not reinvent wheels that already exist:
 | Tool | Role |
 |---|---|
 | [lychee](https://github.com/lycheeverse/lychee) | dead-link checking |
-| [im-not-ai](https://github.com/epoko77-ai/im-not-ai) | stripping the "AI smell" from Korean text |
+| [humanize-korean](https://github.com/epoko77-ai/im-not-ai) (im-not-ai repo) | stripping the "AI smell" from Korean text |
 | ce-compound | learning accumulation (forked from the Compound Engineering plugin) |
 
 What I wrote from scratch is only the part that doesn't exist in the world:

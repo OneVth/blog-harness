@@ -247,14 +247,15 @@ placeholder로 쓰고, 발행 시 PNG를 드래그앤드롭한다.
 ✓ P2P를 어떻게 다시 뚫는지. 이 세 가지를 차례로 풀어본다
 ```
 
-산문의 대시는 `im-not-ai`의 **J: 시각 장식 남용**에 해당한다.
+산문의 대시는 `humanize-korean`의 **J: 시각 장식 남용**에 해당한다.
 문장을 끊거나(`.`), 쉼표로 잇거나, 문장을 나눈다.
 
 **가운뎃점(·)은 허용한다** — 나열에 쓴다 (`NAC·방화벽·WAF`).
 
 ### 4.2 AI 티
 
-`im-not-ai`가 잡는다. 대표적인 것:
+**`humanize-korean` 스킬이 잡는다** (`im-not-ai` repo — 도구 이름은 humanize-korean).
+대표적인 것:
 
 | 카테고리 | 예 |
 |---|---|
@@ -265,7 +266,7 @@ placeholder로 쓰고, 발행 시 PNG를 드래그앤드롭한다.
 | H 접속사 남발 | 문두 `또한/따라서/즉` 연속 |
 | J 시각 장식 | 과도한 **볼드**, 대시 남발 |
 
-**발행 직전에 `im-not-ai`를 돌린다.** 통과한 파일이 최종본이다.
+**발행 직전에 `humanize-korean`을 돌린다.** 통과한 파일이 최종본이다.
 
 ### 4.3 극적 수사 어휘 (POST-12)
 
@@ -303,7 +304,7 @@ placeholder로 쓰고, 발행 시 PNG를 드래그앤드롭한다.
 drafts/<slug>.md        ← 이 문서의 규칙으로 쓴다
       ↓ make check       기계 검사 (링크·태그·카테고리)
       ↓ make factcheck   출처 없는 주장 적발 (§2)
-      ↓ im-not-ai        AI 티 제거 (§4.2)
+      ↓ humanize-korean  AI 티 제거 (§4.2)
 ★ 최종 파일
       ├→ Obsidian 아카이브
       └→ make build → posts/  (callout → HTML)

@@ -36,7 +36,7 @@ drafts/<slug>.md
      ↓ 사람: 다이어그램 검수      ← 게이트 ②
      ↓ make check         링크·태그·카테고리
      ↓ make factcheck     GPT 크로스 검증 (출처 없는 주장)
-     ↓ im-not-ai          AI 티 제거 (외부 도구)
+     ↓ humanize-korean    AI 티 제거 (외부 도구 — im-not-ai repo)
 ★ 최종 파일 확정
      ├→ Obsidian 아카이브 (callout 문법 그대로)
      └→ make build → posts/<slug>.md (callout → HTML)

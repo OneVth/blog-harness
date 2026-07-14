@@ -30,7 +30,7 @@ drafts/<slug>.md
      ↓ 사람: 다이어그램 검수      ← 게이트 ②
      ↓ make check         링크·태그·카테고리
      ↓ make factcheck     GPT 크로스 검증 (출처 없는 주장)
-     ↓ im-not-ai          AI 티 제거 (외부 도구)
+     ↓ humanize-korean    AI 티 제거 (외부 도구 — im-not-ai repo)
 ★ 최종 파일 확정
      ├→ Obsidian 아카이브 (callout 문법 그대로)
      └→ make build → posts/<slug>.md (callout → HTML)
@@ -67,7 +67,7 @@ drafts/<slug>.md
   테이블로는 안 된다.
 - 썸네일이 의도한 개념으로 읽히는가 — 블라인드 테스트가 판정한다.
 - 톤 판단(정의 직술, 1인칭, 절차 안내) — 의미 판단이 필요하다.
-- 한글 글의 "AI 티" — `im-not-ai` 가 잡는다.
+- 한글 글의 "AI 티" — `humanize-korean` 도구가 잡는다 (`im-not-ai` repo).
 - 강의 내 실습 주제 태그 — 문맥 의존. 실습 주제인지 도메인 개념인지 기계는
   모른다.
 
@@ -109,7 +109,7 @@ Embedded
 | 도구 | 역할 |
 |---|---|
 | [lychee](https://github.com/lycheeverse/lychee) | 죽은 링크 검사 |
-| [im-not-ai](https://github.com/epoko77-ai/im-not-ai) | 한글 AI 티 제거 |
+| [humanize-korean](https://github.com/epoko77-ai/im-not-ai) (im-not-ai repo) | 한글 AI 티 제거 |
 | ce-compound | 학습 축적 (Compound Engineering 플러그인에서 fork) |
 
 자작한 건 세상에 없는 도메인 규칙뿐이다 — SVG 좌표 검산, Obsidian → Tistory

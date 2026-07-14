@@ -120,7 +120,7 @@ Python 3.12+ / uv 기반 골격.
         ↓ 사람: 다이어그램 검수      ← 게이트 ②
         ↓ make check         링크·태그·카테고리
         ↓ make factcheck     GPT 크로스 검증 (출처 없는 주장)
-        ↓ im-not-ai          AI 티 제거 (외부 도구)
+        ↓ humanize-korean    AI 티 제거 (외부 도구 — im-not-ai repo)
    ★ 최종 파일 확정
         ├→ Obsidian 아카이브 (callout 문법 그대로)
         └→ make build → posts/<cat>/<slug>.md (callout → HTML)
@@ -703,7 +703,7 @@ validation 이라 토큰을 꽤 먹는다.
    코드에 상수로 박으면 두 곳이 어긋난다.
 
 6. **바퀴를 재발명하지 마라.**
-   죽은 링크 = lychee / AI 티 = im-not-ai / 학습 축적 = ce-compound.
+   죽은 링크 = lychee / AI 티 = humanize-korean (im-not-ai repo) / 학습 축적 = ce-compound.
    자작하는 건 "세상에 없는 내 도메인 규칙"뿐이다.
 
 7. **에러 메시지에 규칙 ID를.** `[ERROR] SVG-06: ...` 로 출력하라.
