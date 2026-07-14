@@ -1,0 +1,132 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>gif anim frame</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html,body{background:#fff;}
+  .frame{width:660px;height:560px;background:#fff;
+    font-family:system-ui,-apple-system,"Noto Sans KR","Malgun Gothic",sans-serif;
+    padding:22px 26px;display:flex;flex-direction:column;}
+  .board svg{width:100%;height:auto;display:block;}
+  .cap{margin-top:8px;padding-top:14px;border-top:1px solid #eef2f6;flex:1 1 auto;}
+  .step-no{font-family:ui-monospace,Menlo,monospace;font-size:13px;font-weight:700;letter-spacing:.04em;}
+  .cap h2{font-size:18px;margin:6px 0 6px;color:#1e242b;letter-spacing:-.01em;}
+  .cap p{font-size:14.5px;color:#5a6570;line-height:1.55;}
+  .dots{display:flex;gap:8px;margin-top:14px;}
+  .dot{width:26px;height:5px;border-radius:3px;background:#e3e8ee;}
+  .dot.on{background:#2f93bd;}
+  .edge{stroke:#d7dde3;stroke-width:1.5;}
+  .path{stroke-width:4;fill:none;stroke-linecap:round;stroke-dasharray:210;stroke-dashoffset:210;}
+  .orange{stroke:#ff5544;} .green{stroke:#2f9e6f;} .compose{stroke:#5db0d7;}
+  .attempt{stroke:#ff2d1a;stroke-width:3;stroke-dasharray:6 5;fill:none;stroke-dashoffset:0;}
+  .region{stroke:#5db0d7;stroke-width:1.5;stroke-dasharray:5 4;fill:none;}
+  .tstatic{fill:none;stroke:#ff2d1a;stroke-width:2.5;}
+  .pulse{fill:none;stroke:#ff2d1a;stroke-width:2.5;}
+  .tag{font-size:12px;}
+</style>
+
+<div class="frame">
+  <div class="board">
+    <svg viewBox="0 0 460 300" xmlns="http://www.w3.org/2000/svg" font-family="Noto Sans CJK KR, sans-serif">
+      <rect id="region" class="region" x="52" y="46" width="214" height="242" rx="12" opacity="0"/>
+      <line id="compose" class="path compose" x1="230" y1="260" x2="370" y2="170" opacity="0"/>
+      <g class="edge">
+        <line x1="90" y1="170" x2="230" y2="80"/>
+        <line x1="230" y1="80" x2="230" y2="260"/>
+        <line x1="90" y1="170" x2="230" y2="260"/>
+        <line x1="230" y1="260" x2="370" y2="170"/>
+        <line x1="230" y1="80" x2="370" y2="170"/>
+      </g>
+      <line id="g1" class="path green" x1="90" y1="170" x2="230" y2="80" opacity="0"/>
+      <line id="g2" class="path green" x1="230" y1="80" x2="230" y2="260" opacity="0"/>
+      <line id="g3" class="path green" x1="230" y1="260" x2="370" y2="170" opacity="0"/>
+      <line id="p1" class="path orange" x1="90" y1="170" x2="230" y2="80" opacity="0"/>
+      <line id="p2" class="path orange" x1="230" y1="80" x2="370" y2="170" opacity="0"/>
+      <line id="p3" class="path orange" x1="370" y1="170" x2="230" y2="260" opacity="0"/>
+      <path id="attempt" class="attempt" d="M230,260 Q345,300 372,182" opacity="0"/>
+      <circle id="tstatic" class="tstatic" cx="370" cy="170" r="27" opacity="0"/>
+      <circle id="pulse" class="pulse" cx="370" cy="170" r="22" opacity="0"/>
+      <g fill="#f5f5f5" stroke="#666" stroke-width="1.5">
+        <circle cx="90" cy="170" r="22"/><circle cx="230" cy="80" r="22"/>
+        <circle cx="230" cy="260" r="22"/><circle cx="370" cy="170" r="22"/>
+      </g>
+      <g font-size="15" fill="#2a2a2a" text-anchor="middle">
+        <text x="90" y="175">s</text><text x="230" y="85">a</text>
+        <text x="230" y="265">v</text><text x="370" y="175">t</text>
+      </g>
+      <text id="t2a" class="tag" x="120" y="38" fill="#2f7fa0" text-anchor="middle" opacity="0">부분 문제 s→v</text>
+      <text id="t2b" class="tag" x="322" y="238" fill="#2f7fa0" text-anchor="middle" opacity="0">붙일 조각 v→t</text>
+      <text id="t4" class="tag" x="414" y="210" fill="#ff2d1a" text-anchor="middle" opacity="0">재방문 불가</text>
+      <text id="t5" class="tag" x="235" y="44" fill="#2f9e6f" text-anchor="middle" opacity="0">실제 최장 s-a-v-t</text>
+    </svg>
+  </div>
+  <div class="cap">
+    <span class="step-no" id="no"></span>
+    <h2 id="title"></h2>
+    <p id="text"></p>
+    <div class="dots" id="dots"></div>
+  </div>
+</div>
+
+<script>
+  const S = [
+    {a:0.0, no:"STEP 1 / 5", c:"#2f93bd", t:"목표 — s에서 t까지 최장 단순 경로",
+     x:"정점을 한 번씩만 지나면서 가장 긴 s→t 경로를 찾는다. 이 그래프의 답은 길이 3."},
+    {a:2.0, no:"STEP 2 / 5", c:"#2f93bd", t:"DP의 기대 — 부분 문제로 쪼개기",
+     x:"부분 문제 s→v를 최적으로 풀고, 마지막 조각 v→t를 붙여 s→t를 만들면 될 것 같다."},
+    {a:4.2, no:"STEP 3 / 5", c:"#e0503f", t:"부분 문제 s→v를 최적으로 풀면",
+     x:"s→v의 진짜 최장 경로는 s-a-t-v (길이 3). 그런데 이 경로가 t를 지나간다."},
+    {a:7.0, no:"STEP 4 / 5", c:"#e0503f", t:"조립 시도 — 그런데 t가 충돌",
+     x:"v→t를 붙이려니 t는 이미 s→v 경로에 쓰였다. 단순 경로라 재방문할 수 없다."},
+    {a:9.8, no:"STEP 5 / 5", c:"#2f9e6f", t:"결론 — 최적 부분 구조 붕괴",
+     x:"부분해(최적 s→v)로는 실제 최장(s-a-v-t)이 안 나온다. 그래서 최장 경로는 DP 불가(NP-hard)."},
+  ];
+  const T_END = 12.6;
+  const clamp = (v,a,b)=>Math.max(a,Math.min(b,v));
+  // 그리기 진행률 (startT 부터 dur 초 동안 0→1)
+  const draw = (el,startT,dur,t)=>{ const f=clamp((t-startT)/dur,0,1);
+    el.style.strokeDashoffset = 210*(1-f); };
+  // opacity: in[i0,i1] 동안 0→1, out[o0,o1] 동안 1→0
+  const fade = (el,i0,i1,o0,o1,t)=>{ let v=clamp((t-i0)/(i1-i0),0,1);
+    if(o0!==null) v=Math.min(v, clamp((o1-t)/(o1-o0),0,1)); el.style.opacity=v; };
+  const $=id=>document.getElementById(id);
+
+  const p = new URLSearchParams(location.search);
+  const t = parseFloat(p.get('t')||'0');
+
+  // STEP 2 — 부분 문제 영역 + 붙일 조각
+  fade($('region'),2.05,2.3,4.0,4.25,t);
+  fade($('compose'),2.1,2.3,4.0,4.25,t); draw($('compose'),2.3,0.5,t);
+  fade($('t2a'),2.2,2.5,4.0,4.2,t); fade($('t2b'),2.2,2.5,4.0,4.2,t);
+
+  // STEP 3 — 주황 경로 s-a-t-v 한 획씩
+  draw($('p1'),4.35,0.5,t); draw($('p2'),4.85,0.5,t); draw($('p3'),5.35,0.5,t);
+  // 주황: 3단계부터 등장, 5단계에서 흐려짐
+  const oOp = t<4.35 ? 0 : (t<9.95 ? 1 : clamp(1-(t-9.95)/0.3,0.18,1));
+  [$('p1'),$('p2'),$('p3')].forEach(e=>e.style.opacity=oOp);
+
+  // STEP 4 — v→t 시도 + t 충돌 펄스
+  fade($('attempt'),7.1,7.35,9.95,10.2,t);
+  fade($('tstatic'),7.2,7.5,9.95,10.2,t);
+  fade($('t4'),7.5,7.8,9.95,10.2,t);
+  // 펄스 링: 7.5~9.8, 주기 1.1s 팽창
+  if(t>=7.5 && t<9.8){ const ph=((t-7.5)%1.1)/1.1;
+    $('pulse').setAttribute('r', 22+16*ph); $('pulse').style.opacity=0.85*(1-ph); }
+  else { $('pulse').style.opacity=0; }
+
+  // STEP 5 — 초록 실제 최장 s-a-v-t
+  draw($('g1'),10.15,0.5,t); draw($('g2'),10.65,0.5,t); draw($('g3'),11.15,0.5,t);
+  const gOp = t<10.15?0:1;
+  [$('g1'),$('g2'),$('g3')].forEach(e=>e.style.opacity=gOp);
+  fade($('t5'),10.5,10.8,null,null,t);
+
+  // 캡션 + 진행 도트 (현재 단계)
+  let si=0; for(let i=0;i<5;i++) if(t>=S[i].a) si=i;
+  const s=S[si];
+  const no=$('no'); no.textContent=s.no; no.style.color=s.c;
+  $('title').textContent=s.t; $('text').textContent=s.x;
+  const capOp = clamp((t-s.a)/0.25,0,1);
+  document.querySelector('.cap').style.opacity=capOp;
+  const db=$('dots');
+  for(let k=0;k<5;k++){const d=document.createElement('div');d.className='dot'+(k<=si?' on':'');db.appendChild(d);}
+</script>

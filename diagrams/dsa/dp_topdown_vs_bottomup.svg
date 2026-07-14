@@ -1,0 +1,64 @@
+<svg viewBox="0 0 520 350" xmlns="http://www.w3.org/2000/svg"
+     font-family="Noto Sans CJK KR, sans-serif">
+
+  <!-- 패널 구분선 -->
+  <line x1="260" y1="55" x2="260" y2="300" stroke="#ddd" stroke-width="1.5" stroke-dasharray="4,3"/>
+
+  <!-- 제목 -->
+  <text x="150" y="38" font-size="13" font-weight="bold" fill="#2a2a2a" text-anchor="middle">메모이제이션 (top-down)</text>
+  <text x="370" y="38" font-size="13" font-weight="bold" fill="#2a2a2a" text-anchor="middle">타뷸레이션 (bottom-up)</text>
+
+  <!-- 왼쪽: 일반 셀 fib(5)~fib(2) -->
+  <g fill="#f5f5f5" stroke="#666" stroke-width="1.5">
+    <rect x="102" y="62"  width="96" height="36" rx="4"/>
+    <rect x="102" y="100" width="96" height="36" rx="4"/>
+    <rect x="102" y="138" width="96" height="36" rx="4"/>
+    <rect x="102" y="176" width="96" height="36" rx="4"/>
+  </g>
+  <!-- 왼쪽: 기저 셀 fib(1),fib(0) -->
+  <g fill="#ffe4e0" stroke="#ff5544" stroke-width="1.5">
+    <rect x="102" y="214" width="96" height="36" rx="4"/>
+    <rect x="102" y="252" width="96" height="36" rx="4"/>
+  </g>
+
+  <!-- 오른쪽: 일반 셀 -->
+  <g fill="#f5f5f5" stroke="#666" stroke-width="1.5">
+    <rect x="322" y="62"  width="96" height="36" rx="4"/>
+    <rect x="322" y="100" width="96" height="36" rx="4"/>
+    <rect x="322" y="138" width="96" height="36" rx="4"/>
+    <rect x="322" y="176" width="96" height="36" rx="4"/>
+  </g>
+  <!-- 오른쪽: 기저 셀 -->
+  <g fill="#ffe4e0" stroke="#ff5544" stroke-width="1.5">
+    <rect x="322" y="214" width="96" height="36" rx="4"/>
+    <rect x="322" y="252" width="96" height="36" rx="4"/>
+  </g>
+
+  <!-- 셀 라벨 -->
+  <g font-size="13" fill="#2a2a2a" text-anchor="middle">
+    <text x="150" y="85">fib(5)</text>
+    <text x="150" y="123">fib(4)</text>
+    <text x="150" y="161">fib(3)</text>
+    <text x="150" y="199">fib(2)</text>
+    <text x="150" y="237">fib(1)</text>
+    <text x="150" y="275">fib(0)</text>
+    <text x="370" y="85">fib(5)</text>
+    <text x="370" y="123">fib(4)</text>
+    <text x="370" y="161">fib(3)</text>
+    <text x="370" y="199">fib(2)</text>
+    <text x="370" y="237">fib(1)</text>
+    <text x="370" y="275">fib(0)</text>
+  </g>
+
+  <!-- 방향 화살표: 왼쪽 아래로, 오른쪽 위로 -->
+  <g stroke="#5db0d7" stroke-width="2" fill="#5db0d7">
+    <line x1="75" y1="66" x2="75" y2="278"/>
+    <polygon points="75,290 69,278 81,278"/>
+    <line x1="445" y1="284" x2="445" y2="74"/>
+    <polygon points="445,62 439,74 451,74"/>
+  </g>
+
+  <!-- 보조 캡션 -->
+  <text x="150" y="322" font-size="11" fill="#888" text-anchor="middle">재귀가 필요한 것만 lazy 계산</text>
+  <text x="370" y="322" font-size="11" fill="#888" text-anchor="middle">0..n 전부 순서대로 채움</text>
+</svg>
