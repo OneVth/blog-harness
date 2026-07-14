@@ -215,5 +215,42 @@ diagrams/<domain>/<name>.svg
 | 제약 | 상태 |
 |---|---|
 | **다크 모드** | PNG는 라이트 모드 기준. 다크 배경에서 흰 박스가 튈 수 있다. **미해결** |
-| **인터랙티브 없음** | PNG는 정적. 애니메이션이 필요하면 외부 링크 (visualgo 등) |
+| **인터랙티브 없음** | PNG는 정적. 순서·인과가 중요하면 §8 GIF (또는 외부 링크 visualgo) |
 | **폰트** | 시스템 폰트만. SUIT(hELLO 본문 폰트) 미설치 → Noto Sans CJK KR |
+
+---
+
+## 8. 애니메이션 다이어그램 (GIF)
+
+정적 SVG로 한눈에 안 들어오는 개념(순서·인과·조립 실패)은 GIF 움짤로 만든다.
+**SVG 파이프라인 밖이다** — `lint-svg` 는 정적 SVG만 검사한다. 예: `dsa/dp_longest_path`.
+
+| 항목 | 값 |
+|---|---|
+| **소스** | `<name>.gif.html` — 시간을 URL 파라미터(`?t=초`)로 받아 그 순간의 상태(경로 그리기 진행률·강조·페이드)를 그리는 HTML+CSS+JS. 프레임을 결정론적으로 재현한다 |
+| **산출물** | `<name>.gif` — **추적한다** (썸네일 PNG 예외처럼 gitignore 대상 아님) |
+| **본문** | `[IMG: <name> (애니메이션)]` placeholder. 발행 시 GIF를 드래그 |
+
+### 렌더 파이프라인 (rsvg 아님 — Chrome + ffmpeg)
+
+```bash
+# 1) 프레임 렌더 — t 를 0부터 끝까지 1/fps 씩
+for f in $(seq 0 150); do t=$(awk "BEGIN{print $f/12}")
+  google-chrome --headless=new --screenshot=frames/$(printf %04d $f).png \
+    --window-size=660,560 --force-device-scale-factor=2 \
+    "file://$PWD/diagrams/dsa/name.gif.html?t=$t"; done
+# 2) 팔레트 최적화로 조립 (색 번짐 방지)
+ffmpeg -framerate 12 -i frames/%04d.png -vf "scale=700:-1,palettegen=stats_mode=diff" pal.png
+ffmpeg -framerate 12 -i frames/%04d.png -i pal.png \
+  -lavfi "scale=700:-1[x];[x][1:v]paletteuse=dither=sierra2_4a" -loop 0 name.gif
+```
+
+### 함정 (검증됨)
+
+- **CSS 스타일시트가 JS `setAttribute` 를 덮어쓴다.** 프레임별 `stroke-dashoffset` 은 반드시
+  인라인 스타일(`el.style.strokeDashoffset`)로 설정한다. 스타일시트 규칙(`.path{...}`)이
+  프레젠테이션 속성보다 우선하므로, `setAttribute` 로 그리면 경로가 안 그려진다.
+- **라벨은 선·노드와 겹치지 않게** 빈 공간에 놓는다 (제작 원칙 §6). 프레임을 실제로 렌더해
+  눈으로 확인한다 — 정적 SVG보다 겹침이 잘 보인다.
+- **정량 애니메이션은 남용하지 않는다.** 트리·배열처럼 정적으로 이미 명확한 건 SVG로 둔다.
+  움짤은 "순서로 풀어야 이해되는" 개념에만 쓴다.
