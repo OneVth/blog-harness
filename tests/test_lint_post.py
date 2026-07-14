@@ -16,6 +16,7 @@ from blog_harness.lint_post import (
     check_dramatic_idiom,
     check_image_refs,
     check_img_placeholder,
+    check_math_underscore,
     check_tags,
     lint_metadata,
     lint_post_text,
@@ -358,3 +359,33 @@ def test_img_placeholder_prose_skipped(tmp_path, text):
     """산문 설명형(첫 토큰이 파일명 꼴 아님)은 검사 대상이 아니다."""
     (tmp_path / "diagrams").mkdir()
     assert check_img_placeholder(text, repo_root=tmp_path) == []
+
+
+# ── POST-14: 수식 안 밑줄 짝 ────────────────────────────────────────────────
+def test_math_paired_underscore_block_warns():
+    """블록 수식 안 _ 2개(짝) → WARN (이번 세션에 깨진 총 비용 식)."""
+    text = r"$$\text{총 비용} = \underbrace{(\text{상태 수})}_{n+1} \times \underbrace{(x)}_{O(1)}$$"
+    findings = check_math_underscore(text)
+    assert "POST-14" in ids(findings)
+    assert WARN in {f.level for f in findings}
+
+
+def test_math_single_underscore_passes():
+    """단일 _ (\\max_i)는 짝이 없어 렌더된다 — 통과(오탐 방지)."""
+    assert check_math_underscore(r"$$dp[i] = \max(a, b), \quad \max_i dp[i]$$") == []
+
+
+def test_math_inline_paired_underscore_warns():
+    """인라인 수식도 _ 2개면 WARN."""
+    assert "POST-14" in ids(check_math_underscore(r"값은 $a_1 + a_2$ 이다."))
+
+
+def test_math_clean_passes():
+    """_ 없는 수식은 통과."""
+    assert check_math_underscore(r"$$O(\varphi^n), \quad \varphi = \frac{1+\sqrt5}{2}$$") == []
+
+
+def test_math_underscore_skips_code_fence():
+    """코드펜스 안의 $ _ _ 는 수식이 아니다."""
+    text = "```bash\necho $A_1 $B_2\n```"
+    assert check_math_underscore(text) == []

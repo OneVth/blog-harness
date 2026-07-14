@@ -1,4 +1,4 @@
-"""발행글 마크다운 린터 — guides/RULES.md 의 POST-01~13 를 강제한다.
+"""발행글 마크다운 린터 — guides/RULES.md 의 POST-01~14 를 강제한다.
 
 파이프라인의 게이트다. 카테고리·태그·구조를 `make check` 에서 기계로 검증해, 매번
 손으로 확인하던 것을 규칙 ID를 출력하는 자동 검사로 바꾼다. RULES.md 가 계약서다 —
@@ -67,6 +67,9 @@ _IMG_RE = re.compile(r"!\[([^\]]*)\]\(([^)]+)\)")
 _IMG_PLACEHOLDER_RE = re.compile(r"\[IMG:\s*([^\]]*)")
 _DIAGRAM_NAME_RE = re.compile(r"^[a-z0-9]+(?:_[a-z0-9]+)+$")  # 소문자_밑줄 복합어만 파일명으로 본다
 _DIAGRAM_EXTS = (".svg", ".gif", ".png")
+# guides/RULES.md § POST-14 — 수식 span 안 밑줄 짝. Tistory 마크다운이 _..._ 를 기울임으로 먹는다
+_MATH_BLOCK_RE = re.compile(r"\$\$(.+?)\$\$")
+_MATH_INLINE_RE = re.compile(r"(?<!\$)\$(?!\$)([^$\n]+?)\$(?!\$)")
 _INLINE_CODE_RE = re.compile(r"`[^`]*`")
 _HEADING_RE = re.compile(r"^(#{1,6})\s")
 _H2_RE = re.compile(r"^##\s+(.+?)\s*$")
@@ -437,6 +440,37 @@ def check_img_placeholder(text: str, repo_root: Path | str | None = None) -> lis
     return findings
 
 
+def check_math_underscore(text: str) -> list[Finding]:
+    """POST-14 — 한 수식 span 안에 밑줄 `_` 이 2개 이상이면 WARN.
+
+    Tistory 마크다운이 `$$`/`$` 안의 `_..._` 를 기울임(emphasis)으로 짝지어 먹어,
+    수식에 `<em>` 이 박혀 KaTeX 가 깨진다 (실측 2026-07: `\\underbrace{}_{n+1} … _{O(1)}`).
+    단일 `_` 는 통과 — `\\max_i` 처럼 짝이 없어 렌더된다 (오탐 방지, 그래서 WARN).
+    """
+    lines = text.splitlines()
+    mask = _fence_mask(lines)
+    findings: list[Finding] = []
+    for i, line in enumerate(lines):
+        if mask[i]:
+            continue
+        cleaned = _INLINE_CODE_RE.sub("", line)  # 인라인 코드의 $ 는 수식 아님
+        spans = [m.group(1) for m in _MATH_BLOCK_RE.finditer(cleaned)]
+        no_block = _MATH_BLOCK_RE.sub("", cleaned)  # 블록 $$ 가 인라인으로 중복 매치되지 않게
+        spans += [m.group(1) for m in _MATH_INLINE_RE.finditer(no_block)]
+        for span in spans:
+            n = span.count("_")
+            if n >= 2:
+                findings.append(
+                    Finding(
+                        WARN,
+                        "POST-14",
+                        f"수식 안 밑줄 `_` 이 {n}개 (line {i + 1}) — Tistory 마크다운이 "
+                        "`_..._` 를 기울임으로 먹어 KaTeX 가 깨진다. 아래첨자 2개 이상은 평문으로.",
+                    )
+                )
+    return findings
+
+
 def check_section_depth(text: str) -> list[Finding]:
     """POST-08 — #### 이하 금지, # 은 제목에만 (WARN)."""
     lines = text.splitlines()
@@ -606,13 +640,14 @@ def check_dead_links(
 def lint_post_text(
     text: str, path: str = "mem.md", repo_root: Path | str | None = None
 ) -> list[Finding]:
-    """한 마크다운 텍스트에 본문 체크(POST-07~13)를 적용한다. 테스트 코어.
+    """한 마크다운 텍스트에 본문 체크(POST-07~14)를 적용한다. 테스트 코어.
 
     메타데이터 체크(POST-01~05)는 frontmatter/CLI 인자에서 오므로 여기 없다 — lint_metadata 참조.
     """
     findings: list[Finding] = []
     findings += check_image_refs(text, repo_root)
     findings += check_img_placeholder(text, repo_root)
+    findings += check_math_underscore(text)
     findings += check_section_depth(text)
     findings += check_conclusion(text)
     findings += check_body_dash(text)
@@ -721,7 +756,7 @@ def _run_lint(
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
-        prog="lint-post", description="발행글 마크다운 린터 (guides/RULES.md POST-01~13)"
+        prog="lint-post", description="발행글 마크다운 린터 (guides/RULES.md POST-01~14)"
     )
     parser.add_argument("paths", nargs="+", help="마크다운 파일 또는 디렉토리(재귀)")
     parser.add_argument("--category", help="글의 카테고리 (POST-01)")
