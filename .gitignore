@@ -4,6 +4,9 @@
 !thumbnails/*.png
 # 재-무시: .150.png 는 thumbnail_check 가 만든 파생 산출물이다 (소스 아님)
 thumbnails/*.150.png
+# 예외: diagrams/meta 는 README 임베드용 렌더 PNG. 블로그 글 다이어그램은 Tistory CDN 으로
+# 드래그하니 gitignore 로 족하지만, README(GitHub) 임베드 이미지는 repo 안에 있어야 뜬다.
+!diagrams/meta/*.png
 
 .venv/
 __pycache__/
