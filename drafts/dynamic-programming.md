@@ -2,6 +2,14 @@
 category: DSA
 tags: [DynamicProgramming, 동적계획법, Memoization, Tabulation, Kadane, Algorithm, CLRS, 입문]
 ---
+<!-- DIAGRAM-LEDGER
+중복 부분 문제 → 그림 (dp_fib_tree) | 같은 노드가 여러 번 호출되는 걸 한 장으로
+top-down vs bottom-up → 그림 (dp_topdown_vs_bottomup) | 계산 방향 대비라 배치가 의미
+Kadane dp 배열 채우기 → 그림 (dp_kadane) | 왼쪽부터 채워지는 순서가 핵심
+최장 경로 부분 문제 충돌 → 그림 (dp_longest_path, 애니메이션) | 정점 충돌은 순차 단계라 움짤
+복잡도·점화식 → 산문+수식 | 한 줄 식으로 충분, 그림 불필요
+구현 두 가지 비교 → 표 | 비교라 §3.4 표가 맞음
+-->
 
 # 동적 계획법 입문 — 성립 조건과 점화식 도출
 
