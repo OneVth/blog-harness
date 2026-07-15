@@ -39,7 +39,7 @@ after, each of them either *computational* (deterministic) or *inferential*
 The sensor row now holds `lint-post` and `factcheck`, but at the start it was
 empty. I had the guides as documents and nothing else; a single human was doing
 all the sensing by hand, against five documents. That does not scale, and it
-does not hold.
+does not last.
 
 So the governing rule is: **if a rule can be checked by a machine, move it out of
 the document and into code.** And when the agent makes a mistake, don't patch the
@@ -124,8 +124,8 @@ syntax, and the HTML is a build artifact.
 
 - **Only what is written there becomes code. What is not there is not checked.**
 - **No false positives.** If the linter flags something that is actually fine,
-  the human learns to ignore the linter, and the moment that happens the harness
-  is dead. When in doubt, downgrade: ERROR → WARN → INFO.
+  the human learns to ignore the linter, and the moment that happens, the linter
+  stops being used. When in doubt, downgrade: ERROR → WARN → INFO.
 
 Every rule is defined with an ID, a level, a condition, and a source. A linter
 error prints the rule ID; the ID leads you back to the document that defines it.
@@ -175,8 +175,8 @@ rule-ID comment.
 
 ## When measurement overruled the document
 
-The most instructive part of building this was watching real measurement
-contradict the design documents. Every one of these would have been missed by
+The most instructive part of building this was how often real measurement
+contradicted the design documents. Every one of these would have been missed by
 reading the docs alone:
 
 | The document said | What measurement showed |
@@ -237,8 +237,8 @@ The vendored `ce-compound` skill is a fork of the Compound Engineering plugin
 
 This project applies harness engineering to a **non-coding** domain. I looked at
 Superpowers, Compound Engineering, Ouroboros, and grill-me-codex, but they were
-all coding harnesses, and the spine those rely on (compiler, linter, test suite)
-doesn't exist for a blog. That spine had to be built by hand here.
+all coding harnesses, and the foundation those rely on (compiler, linter, test
+suite) doesn't exist for a blog. I had to build that foundation here myself.
 
 - Birgitta Böckeler, "Harness Engineering" (on martinfowler.com) —
   <https://martinfowler.com/articles/exploring-gen-ai/harness-engineering.html>
