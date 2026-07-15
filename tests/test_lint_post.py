@@ -13,6 +13,7 @@ from blog_harness.lint_post import (
     SpecError,
     _find_guides_dir,
     check_dead_links,
+    check_diagram_ledger,
     check_dramatic_idiom,
     check_image_refs,
     check_img_placeholder,
@@ -47,7 +48,10 @@ def tag_ids(tags: list[str]) -> list[str]:
 
 
 # 최소 정상 글: 제목·섹션·마무리·언어태그 코드블록. 대시·이미지 없음.
-CLEAN_POST = """# 제목 — 부제에는 대시를 써도 된다
+CLEAN_POST = """<!-- DIAGRAM-LEDGER
+핵심 개념 → 산문 | 선형 서사라 그림 불필요
+-->
+# 제목 — 부제에는 대시를 써도 된다
 
 ## 들어가며
 
@@ -378,6 +382,31 @@ def test_math_single_underscore_passes():
 def test_math_inline_paired_underscore_warns():
     """인라인 수식도 _ 2개면 WARN."""
     assert "POST-14" in ids(check_math_underscore(r"값은 $a_1 + a_2$ 이다."))
+
+
+# ── POST-15: 다이어그램 결정 원장 ──────────────────────────────────────────
+def test_ledger_present_passes():
+    """원장 블록에 내용이 있으면 통과 (존재만 검사)."""
+    text = "<!-- DIAGRAM-LEDGER\n2×2 → 그림 | 배치가 의미\n-->\n\n# 글\n본문."
+    assert check_diagram_ledger(text) == []
+
+
+def test_ledger_missing_warns():
+    """원장이 없으면 WARN — 판단을 건너뛰지 않게 하는 forcing function."""
+    findings = check_diagram_ledger("# 글\n다이어그램 판단을 안 남긴 초안.")
+    assert "POST-15" in ids(findings)
+    assert WARN in {f.level for f in findings}
+
+
+def test_ledger_empty_warns():
+    """블록은 있지만 내용 줄이 없으면 WARN."""
+    findings = check_diagram_ledger("<!-- DIAGRAM-LEDGER\n\n-->\n# 글")
+    assert "POST-15" in ids(findings)
+
+
+def test_ledger_content_not_judged():
+    """내용·형식은 판단하지 않는다 (POST-13 처럼 존재만) — 자유 형식도 통과."""
+    assert check_diagram_ledger("<!-- DIAGRAM-LEDGER 아무 메모나 한 줄 -->\n# 글") == []
 
 
 def test_math_clean_passes():

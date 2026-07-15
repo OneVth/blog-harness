@@ -1,4 +1,4 @@
-"""발행글 마크다운 린터 — guides/RULES.md 의 POST-01~14 를 강제한다.
+"""발행글 마크다운 린터 — guides/RULES.md 의 POST-01~15 를 강제한다.
 
 파이프라인의 게이트다. 카테고리·태그·구조를 `make check` 에서 기계로 검증해, 매번
 손으로 확인하던 것을 규칙 ID를 출력하는 자동 검사로 바꾼다. RULES.md 가 계약서다 —
@@ -71,6 +71,8 @@ _DIAGRAM_EXTS = (".svg", ".gif", ".png")
 _MATH_BLOCK_RE = re.compile(r"\$\$(.+?)\$\$")
 _MATH_INLINE_RE = re.compile(r"(?<!\$)\$(?!\$)([^$\n]+?)\$(?!\$)")
 _INLINE_CODE_RE = re.compile(r"`[^`]*`")
+# guides/RULES.md § POST-15 — 다이어그램 결정 원장 (초안 상단 HTML 주석 블록)
+_LEDGER_RE = re.compile(r"<!--\s*DIAGRAM-LEDGER\b(.*?)-->", re.DOTALL)
 _HEADING_RE = re.compile(r"^(#{1,6})\s")
 _H2_RE = re.compile(r"^##\s+(.+?)\s*$")
 # guides/RULES.md § POST-10 — 본문 산문의 대시. em(—)·en(–) 둘 다. 가운뎃점(·)·하이픈(-)은 제외
@@ -585,6 +587,35 @@ def check_dramatic_idiom(text: str, idioms: frozenset[str]) -> list[Finding]:
     return findings
 
 
+def check_diagram_ledger(text: str) -> list[Finding]:
+    """POST-15 — 초안에 <!-- DIAGRAM-LEDGER ... --> 결정 원장이 있어야 한다 (WARN).
+
+    "이 개념을 그림으로 낼지"의 판단을 강제하는 forcing function. **존재만** 검사한다 —
+    내용·완전성은 Claude 판단이다 (POST-13 이 파일명 존재만 보는 것과 같은 teeth).
+    형식을 강제하면 오탐이 나므로, 블록 부재·빈 블록일 때만 WARN. build 가 발행본에서
+    이 블록을 떼어낸다 (convert_callouts). 출처: writing.md §3.5.
+    """
+    m = _LEDGER_RE.search(text)
+    if m is None:
+        return [
+            Finding(
+                WARN,
+                "POST-15",
+                "다이어그램 결정 원장이 없다 — 초안 상단에 <!-- DIAGRAM-LEDGER ... --> 로 "
+                "핵심 개념마다 그림/표/산문 중 무엇으로 낼지 한 줄씩 남긴다. writing.md §3.5",
+            )
+        ]
+    if not any(ln.strip() for ln in m.group(1).splitlines()):
+        return [
+            Finding(
+                WARN,
+                "POST-15",
+                "다이어그램 결정 원장이 비어 있다 — 개념별 결정을 한 줄씩 채운다. writing.md §3.5",
+            )
+        ]
+    return []
+
+
 def check_code_lang(text: str) -> list[Finding]:
     """POST-11 — 여는 코드펜스에 언어 태그가 없으면 WARN."""
     findings: list[Finding] = []
@@ -640,7 +671,7 @@ def check_dead_links(
 def lint_post_text(
     text: str, path: str = "mem.md", repo_root: Path | str | None = None
 ) -> list[Finding]:
-    """한 마크다운 텍스트에 본문 체크(POST-07~14)를 적용한다. 테스트 코어.
+    """한 마크다운 텍스트에 본문 체크(POST-07~15)를 적용한다. 테스트 코어.
 
     메타데이터 체크(POST-01~05)는 frontmatter/CLI 인자에서 오므로 여기 없다 — lint_metadata 참조.
     """
@@ -653,6 +684,7 @@ def lint_post_text(
     findings += check_body_dash(text)
     findings += check_dramatic_idiom(text, load_dramatic_idioms(str(_find_guides_dir())))
     findings += check_code_lang(text)
+    findings += check_diagram_ledger(text)
     return findings
 
 
@@ -756,7 +788,7 @@ def _run_lint(
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
-        prog="lint-post", description="발행글 마크다운 린터 (guides/RULES.md POST-01~14)"
+        prog="lint-post", description="발행글 마크다운 린터 (guides/RULES.md POST-01~15)"
     )
     parser.add_argument("paths", nargs="+", help="마크다운 파일 또는 디렉토리(재귀)")
     parser.add_argument("--category", help="글의 카테고리 (POST-01)")

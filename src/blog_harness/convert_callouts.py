@@ -37,6 +37,8 @@ INFO = "INFO"
 _FENCE_RE = re.compile(r"^(\s*)(`{3,}|~{3,})(.*)$")
 # 선행 YAML frontmatter — 발행본에서 제거 (lint_post.parse_frontmatter 와 대칭)
 _FRONTMATTER_RE = re.compile(r"\A---[ \t]*\n.*?\n---[ \t]*\n?", re.DOTALL)
+# 다이어그램 결정 원장 (POST-15) — 초안 전용. 발행본에서 제거 (lint_post._LEDGER_RE 와 대칭)
+_LEDGER_RE = re.compile(r"<!--\s*DIAGRAM-LEDGER\b.*?-->[ \t]*\n?", re.DOTALL)
 # callout 헤더: `> [!타입]` (foldable +/- 는 §6 에서 무시). title 은 선택.
 _CALLOUT_RE = re.compile(r"^>\s?\[!(\w+)\][-+]?\s*(.*?)\s*$")
 # blockquote 본문 한 줄 — 선행 `> ` 하나를 벗긴다
@@ -309,8 +311,10 @@ def convert_text(
 
     선행 YAML frontmatter(카테고리·태그 메타데이터의 집)는 발행본에서 떼어낸다 —
     Tistory 에 새면 안 된다. 메타데이터는 초안에만 살고 lint_post 가 거기서 읽는다.
+    다이어그램 결정 원장(POST-15, <!-- DIAGRAM-LEDGER ... -->)도 초안 전용이라 제거한다.
     """
     text = _FRONTMATTER_RE.sub("", text, count=1)
+    text = _LEDGER_RE.sub("", text)
     lines = text.splitlines()
     fence = _fence_mask(lines)
     out: list[str] = []
