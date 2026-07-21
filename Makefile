@@ -33,6 +33,7 @@ endif
 
 # SVG는 소스, PNG는 산출물(gitignore). rsvg-convert 필요 (apt-get install librsvg2-bin)
 png:
+	@command -v rsvg-convert >/dev/null 2>&1 || { echo "[png] rsvg-convert 이 없습니다. 설치: apt-get install librsvg2-bin"; exit 1; }
 	find diagrams -name '*.svg' -exec sh -c 'rsvg-convert -w 2160 "$$0" -o "$${0%.svg}.png"' {} \;
 
 # 애니메이션 GIF 렌더 (diagram-system.md §8). 정적은 make png. Chrome + ffmpeg 필요.
