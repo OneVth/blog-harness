@@ -1,0 +1,69 @@
+<svg viewBox="0 0 600 400" xmlns="http://www.w3.org/2000/svg"
+     font-family="Noto Sans CJK KR, sans-serif">
+
+  <!-- 제목 -->
+  <text x="300" y="26" font-size="13" font-weight="bold" fill="#2a2a2a" text-anchor="middle">교환 논법 : 최적해 O 의 첫 활동 a1 을 g 로 바꿔치기</text>
+
+  <!-- 상단 라벨 -->
+  <text x="80" y="52" font-size="12" font-weight="bold" fill="#888">최적해 O</text>
+
+  <!-- 후보 g (점선, 가장 일찍 끝남) -->
+  <rect x="118" y="60" width="76" height="18" rx="4" fill="#fff7e6" stroke="#ff5544" stroke-width="1.5" stroke-dasharray="4,3"/>
+  <text x="156" y="73" font-size="12" fill="#ff5544" text-anchor="middle">g</text>
+  <text x="204" y="73" font-size="11" fill="#888">전체에서 가장 일찍 끝남</text>
+
+  <!-- O 의 활동들 -->
+  <rect x="156" y="90" width="76" height="20" rx="4" fill="#e8f4fa" stroke="#5db0d7" stroke-width="2"/>
+  <text x="194" y="104" font-size="12" fill="#2a2a2a" text-anchor="middle">a1</text>
+  <g fill="#f5f5f5" stroke="#bbb" stroke-width="1.5">
+    <rect x="270" y="90" width="76" height="20" rx="4"/>
+    <rect x="384" y="90" width="76" height="20" rx="4"/>
+  </g>
+  <g font-size="12" fill="#2a2a2a" text-anchor="middle">
+    <text x="308" y="104">a2</text>
+    <text x="422" y="104">a3</text>
+  </g>
+
+  <!-- 종료·시작 시각 비교 점선 -->
+  <line x1="194" y1="56" x2="194" y2="128" stroke="#ff5544" stroke-width="1.5" stroke-dasharray="3,3"/>
+  <line x1="232" y1="86" x2="232" y2="128" stroke="#5db0d7" stroke-width="1.5" stroke-dasharray="3,3"/>
+  <line x1="270" y1="86" x2="270" y2="128" stroke="#888" stroke-width="1.5" stroke-dasharray="3,3"/>
+  <g font-size="10" text-anchor="middle">
+    <text x="194" y="140" fill="#ff5544">f(g)</text>
+    <text x="232" y="140" fill="#5db0d7">f(a1)</text>
+    <text x="271" y="140" fill="#888">s(a2)</text>
+  </g>
+
+  <!-- 교환 화살표 (오른쪽) -->
+  <g stroke="#5db0d7" stroke-width="2" fill="#5db0d7">
+    <line x1="530" y1="100" x2="530" y2="182"/>
+    <polygon points="530,194 524,182 536,182"/>
+  </g>
+  <text x="544" y="130" font-size="11" fill="#888">a1 을</text>
+  <text x="544" y="145" font-size="11" fill="#888">g 로</text>
+  <text x="544" y="160" font-size="11" fill="#888">교환</text>
+
+  <!-- 하단 라벨 -->
+  <text x="80" y="184" font-size="12" font-weight="bold" fill="#888">O' = O - a1 + g</text>
+
+  <!-- O' 의 활동들 -->
+  <rect x="118" y="200" width="76" height="20" rx="4" fill="#ffe4e0" stroke="#ff5544" stroke-width="2"/>
+  <text x="156" y="214" font-size="12" fill="#ff5544" text-anchor="middle">g</text>
+  <g fill="#f5f5f5" stroke="#bbb" stroke-width="1.5">
+    <rect x="270" y="200" width="76" height="20" rx="4"/>
+    <rect x="384" y="200" width="76" height="20" rx="4"/>
+  </g>
+  <g font-size="12" fill="#2a2a2a" text-anchor="middle">
+    <text x="308" y="214">a2</text>
+    <text x="422" y="214">a3</text>
+  </g>
+  <text x="480" y="214" font-size="11" fill="#888">개수 그대로 (3개)</text>
+
+  <!-- 부등호 사슬 박스 -->
+  <rect x="80" y="248" width="440" height="60" rx="4" fill="#f5f5f5" stroke="#666" stroke-width="1.5"/>
+  <text x="300" y="272" font-size="13" fill="#2a2a2a" text-anchor="middle">f(g)  ≤  f(a1)  ≤  s(a2), s(a3)   그러므로   f(g) ≤ s(나머지)</text>
+  <text x="300" y="294" font-size="11" fill="#888" text-anchor="middle">g 가 가장 일찍 끝나므로 a1 자리에 넣어도 뒤 활동과 안 겹친다</text>
+
+  <!-- 캡션 -->
+  <text x="300" y="336" font-size="11" fill="#888" text-anchor="middle">g 가 든 최적해가 항상 존재한다. 남은 부분에 같은 논리를 반복한다.</text>
+</svg>

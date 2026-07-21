@@ -1,0 +1,45 @@
+<svg viewBox="0 0 600 350" xmlns="http://www.w3.org/2000/svg"
+     font-family="Noto Sans CJK KR, sans-serif">
+
+  <!-- column headers -->
+  <g text-anchor="middle">
+    <text x="248" y="28" font-size="13" font-weight="bold" fill="#2a2a2a">Computational</text>
+    <text x="248" y="43" font-size="11" fill="#888">deterministic</text>
+    <text x="455" y="28" font-size="13" font-weight="bold" fill="#2a2a2a">Inferential</text>
+    <text x="455" y="43" font-size="11" fill="#888">AI-judged</text>
+  </g>
+
+  <!-- row labels -->
+  <g text-anchor="middle">
+    <text x="80" y="102" font-size="13" font-weight="bold" fill="#5db0d7">Guides</text>
+    <text x="80" y="118" font-size="10" fill="#888">feedforward / before</text>
+    <text x="80" y="242" font-size="13" font-weight="bold" fill="#ff5544">Sensors</text>
+    <text x="80" y="258" font-size="10" fill="#888">feedback / after</text>
+  </g>
+
+  <!-- guides row cells (blue) : computational solid, inferential dashed -->
+  <rect x="150" y="56" width="195" height="104" rx="4" fill="#e8f4fa" stroke="#5db0d7" stroke-width="1.5"/>
+  <rect x="358" y="56" width="195" height="104" rx="4" fill="#e8f4fa" stroke="#5db0d7" stroke-width="1.5" stroke-dasharray="4,3"/>
+
+  <!-- sensors row cells (orange) : computational solid, inferential dashed -->
+  <rect x="150" y="196" width="195" height="104" rx="4" fill="#fff7e6" stroke="#ff5544" stroke-width="1.5"/>
+  <rect x="358" y="196" width="195" height="104" rx="4" fill="#fff7e6" stroke="#ff5544" stroke-width="1.5" stroke-dasharray="4,3"/>
+
+  <!-- cell contents : generic example + this repo's instance -->
+  <g text-anchor="middle">
+    <text x="247" y="104" font-size="12" fill="#2a2a2a">scripts, codemods</text>
+    <text x="247" y="126" font-size="11" fill="#888">this repo: make build</text>
+
+    <text x="455" y="104" font-size="12" fill="#2a2a2a">rules, guides, how-tos</text>
+    <text x="455" y="126" font-size="11" fill="#888">RULES.md, writing.md</text>
+
+    <text x="247" y="244" font-size="12" fill="#2a2a2a">linters, tests</text>
+    <text x="247" y="266" font-size="11" fill="#888">lint-post, lint-svg</text>
+
+    <text x="455" y="244" font-size="12" fill="#2a2a2a">review agents, LLM-judge</text>
+    <text x="455" y="266" font-size="11" fill="#888">factcheck, blind test</text>
+  </g>
+
+  <!-- caption : the steering loop -->
+  <text x="300" y="332" font-size="11" fill="#888" text-anchor="middle">The human steers by iterating on the harness: a repeated mistake becomes a new guide or sensor.</text>
+</svg>

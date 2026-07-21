@@ -240,3 +240,11 @@ def test_no_frontmatter_body_unchanged():
     text = "# 제목\n\n본문 그대로."
     out, _ = convert_text(text, ALIASES, TITLES)
     assert out.startswith("# 제목")
+
+
+def test_diagram_ledger_stripped_from_output():
+    """POST-15 결정 원장은 초안 전용 — 발행본에 새면 안 된다."""
+    text = "<!-- DIAGRAM-LEDGER\n2×2 → 그림 | 이유\n-->\n\n# 제목\n\n본문."
+    out, _ = convert_text(text, ALIASES, TITLES)
+    assert "DIAGRAM-LEDGER" not in out
+    assert out.lstrip().startswith("# 제목")
