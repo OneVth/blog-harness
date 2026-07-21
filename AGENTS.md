@@ -6,6 +6,12 @@
 여기 사는 것은 **린터·변환기·팩트체커**다. 설계 문서는 강제력이 없어 지켜지지
 않는다. 그래서 기계로 검증 가능한 규칙을 전부 코드로 옮긴다.
 
+**글감(원재료)도 여기서 시작하지 않는다.** 발행할 learning 은
+`~/workspace/workbench/docs/solutions/` 에 쌓인다 — workbench 에서 작업하며
+`ce-compound` 로 정제한 학습이 원재료다. blog-harness 는 그걸 `drafts/<slug>.md`
+초안으로 확장한다. (이 저장소의 `docs/solutions/` 는 *이 기계 자체의* 툴링 학습이지,
+글감이 아니다.)
+
 ## 원칙
 
 **에이전트가 실수하면 프롬프트를 고치지 말고, 그 실수가 구조적으로 재발할 수
@@ -92,7 +98,7 @@ drafts/<slug>.md
 | `thumbnails/` | GPT가 만든 썸네일 소스 (PNG 예외로 추적) |
 | `posts/` | 변환된 발행본 (`<slug>.md`) |
 | `factcheck/` | 팩트체크 로그 |
-| `docs/solutions/` | 문서화된 해결 기록 (버그·툴링 결정·워크플로·규칙) — 카테고리별 디렉토리 + YAML frontmatter(`module`·`tags`·`problem_type`)로 검색. 문서화된 영역에서 구현·디버깅·결정 시 참고. `ce-compound` 스킬이 씀 |
+| `docs/solutions/` | **이 기계 자체의** 툴링 학습 — 하네스 코드·워크플로를 만지며 얻은 해결 기록. 카테고리별 디렉토리 + YAML frontmatter(`module`·`tags`·`problem_type`)로 검색, `ce-compound` 스킬이 씀. **발행 글감이 아니다** — 글감은 `~/workspace/workbench/docs/solutions/` 에 있다 |
 
 > **이 저장소는 public 이다.** `docs/solutions/` 에 내부 인프라 세부를 쓰지 않는다 —
 > 내부 IP, 터널 이름, 도메인, 서비스 구성. "내 환경에서는" 으로 추상화한다.
