@@ -62,6 +62,23 @@ _FORBIDDEN = (
     "MMORPG 아이템 아이콘 · 모바일 게임 UI · SF HUD · 복잡한 인터페이스 · 과도한 텍스트."
 )
 
+# guides/thumbnails.md §2.5 — OSS Tools 는 개념 아이콘이 아니라 도구 로고를 쓴다.
+# 카테고리별 분기라 자라는 목록은 아니지만, 로고 카테고리가 늘면 여기 한 줄 추가한다.
+_LOGO_CATEGORIES = frozenset({"OSS Tools"})
+_INTRO_CONCEPT = "기술 개념 하나를 직관적인 오브젝트 하나로 압축한 **교육용 아이콘**이다."
+_INTRO_LOGO = "글이 다루는 도구의 **공식 로고**를 담은 교육용 썸네일이다."
+# 개념 글: 코드·로고 금지. OSS Tools: 로고가 오브젝트 (§2.5).
+_NO_CODE_LOGO = (
+    "이 카테고리(OSS Tools)는 도구 로고를 그린다 (§2.5). 글이 다루는 도구의 로고를\n"
+    "오브젝트로 삼되, 블로그 공통 픽셀아트 스타일로 그린다. 로고의 형태와 식별 색은\n"
+    "유지해 무슨 도구인지 알아볼 수 있게 한다. 코드 스크린샷·터미널·소스 문자열은 금지."
+)
+_OBJECT_RULES_LOGO = (
+    "로고를 화면의 40~60%로 중앙 배치, 여백 충분히. 로고 고유 색은 유지한다\n"
+    "(무지개 금지 규칙은 로고에 적용하지 않는다). 배경과 또렷이 분리되게 로고 전체에\n"
+    "밝은 크림색 외곽선(키라인)과 옅은 그림자를 주어 스티커처럼 배경 위에 떠 보이게 한다."
+)
+
 # 채워지지 않은 자리 표시자. Claude 가 초안을 읽고 채운다 (thumbnails.md §2.4).
 _OBJECT_PLACEHOLDER = "{{OBJECT}}"
 _CONCEPT_PLACEHOLDER = "{{CONCEPT}}"
@@ -153,6 +170,20 @@ def build_prompt(
     obj = object_text if object_text else _OBJECT_PLACEHOLDER
     con = concept if concept else _CONCEPT_PLACEHOLDER
     rat = rationale if rationale else _RATIONALE_PLACEHOLDER
+
+    # guides/thumbnails.md §2.5 — OSS Tools 는 로고 오브젝트로 분기한다.
+    is_logo = category in _LOGO_CATEGORIES
+    intro = _INTRO_LOGO if is_logo else _INTRO_CONCEPT
+    object_rules = _OBJECT_RULES_LOGO if is_logo else _OBJECT_RULES
+    draw_heading = "## 로고" if is_logo else "## 코드를 그리지 않는다"
+    draw_block = _NO_CODE_LOGO if is_logo else _NO_CODE
+    only_one = "딱 이 로고 1개만 그린다." if is_logo else "딱 이 오브젝트 1개만 그린다."
+    final_line = (
+        "150px 로 줄여도 무슨 도구인지 로고로 식별돼야 한다."
+        if is_logo
+        else "150px 로 줄여도 무엇인지 보여야 한다. 디테일이 필요하면 오브젝트를 잘못 고른 것이다."
+    )
+
     return f"""\
 # 개념: {con}
 # 오브젝트: {obj}
@@ -163,15 +194,15 @@ def build_prompt(
 # ── 아래부터 GPT 이미지 생성기에 붙여넣는다 ───────────────────────────────
 
 기술 블로그 썸네일 한 장을 만든다. 화려한 유튜브 썸네일도, 광고 배너도 아니다 —
-기술 개념 하나를 직관적인 오브젝트 하나로 압축한 **교육용 아이콘**이다.
+{intro}
 
 ## 오브젝트 (핵심)
 오브젝트: {obj}
-딱 이 오브젝트 1개만 그린다.
-{_OBJECT_RULES}
+{only_one}
+{object_rules}
 
-## 코드를 그리지 않는다
-{_NO_CODE}
+{draw_heading}
+{draw_block}
 
 ## 스타일
 {_STYLE}
@@ -190,7 +221,7 @@ def build_prompt(
 {_FORBIDDEN}
 
 ## 최종 조건
-150px 로 줄여도 무엇인지 보여야 한다. 디테일이 필요하면 오브젝트를 잘못 고른 것이다.
+{final_line}
 """
 
 
